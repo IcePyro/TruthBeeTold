@@ -41,6 +41,7 @@ function createOrJoin(socket){
         if(io.sockets.adapter.rooms.has(lobbyid)){
             socket.removeAllListeners("createlobby")
             socket.removeAllListeners("joinlobby")
+            socket.rooms.clear()
             socket.join(lobbyid)
             lobby(socket)
         }else{
@@ -57,19 +58,22 @@ function lobby(socket){
     console.log(lobbysettings)
     socket.on("toggleready",()=>{
         activeUsers[socket.data.id]["ready"] = !(activeUsers[socket.data.id]["ready"])
-
+        console.log("user " + socket.data.id + " ready: " + activeUsers[socket.data.id]["ready"])
+        checkAllSocketsReady(socket.rooms.keys().next().value)
     })
 }
 
-function checkAllSocketsReady(socket){
-    //const ready = socket.rooms.
+function checkAllSocketsReady(roomID){
+    //TODO clean up this mess. very messy way of checking if all users are ready
+    Array.from(io.of("/").adapter.rooms.get(roomID)).reduce((acc, curr) =>
+    {acc && activeUsers[io.sockets.sockets.get(curr).data.id]["ready"]}, true);
 }
 
 function generateNextLobbyID(){
     //TODO: Hash lobby id
     lobbyCounter += 1
     console.log("new lobby id created: " + lobbyCounter)
-    return 42
+    return lobbyCounter.toString()
 }
 
 server.listen(3000)
