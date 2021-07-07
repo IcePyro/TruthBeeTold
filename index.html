@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<HTML>
+<head>
+
+</head>
+<body>
+<div id="flexelement">
+    <button id="createlobbybutton">Create New Lobby</button>
+</div>
+<form id="joinlobbyform" action="">
+    <input id="joinlobbyinput" autocomplete="off"><button formaction="submit">join</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    socket  = io();
+
+    var createlobby = document.getElementById('createlobbybutton');
+    var flex = document.getElementById("flexelement");
+
+    createlobby.addEventListener("click", function() {
+        console.log("0")
+        socket.emit("createlobby");
+    });
+
+    socket.on("createlobbyhtml", (html) => {
+        flex.innerHTML = html;
+        document.getElementById("sendsettings").addEventListener("click", function () {
+            socket.emit("settings", {maxplayers: 8})
+        })
+    });
+</script>
+</body>
+</HTML>
