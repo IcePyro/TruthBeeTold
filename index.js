@@ -74,8 +74,10 @@ function startRoom(roomID){
     io.to(roomID).emit("gamestart")
     console.log("starting room: "+ roomID)
     getAllSocketsInRoom(roomID).forEach((socket) =>{
+        //TODO remove lockin listeners
         activeUsers[socket.data.id]["articleID"] = undefined
         console.log("adding listener for article lock in for socket: " + socket.data.id)
+        //TODO Article lockin should be time limited
         socket.on("lockinarticle", (articleID)=>{
             activeUsers[socket.data.id]["articleID"] = articleID
             console.log("socket "+ socket.data.id + " has locked in the article " + articleID)
