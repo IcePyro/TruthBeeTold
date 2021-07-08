@@ -59,15 +59,31 @@ function lobby(socket){
     socket.on("toggleready",()=>{
         activeUsers[socket.data.id]["ready"] = !(activeUsers[socket.data.id]["ready"])
         console.log("user " + socket.data.id + " ready: " + activeUsers[socket.data.id]["ready"])
-        checkAllSocketsReady(socket.rooms.keys().next().value)
+
+        //TODO Add check for atleast 3 Sockets, as that is the minimum required amount of players
+        const roomID = socket.rooms.keys().next().value;
+        let allSocketsReady = checkAllSocketsReady(roomID);
+        console.log(allSocketsReady);
+        if(allSocketsReady){
+            startRoom(roomID);
+        }
     })
 }
 
-function checkAllSocketsReady(roomID){
-    //TODO clean up this mess. very messy way of checking if all users are ready
-    Array.from(io.of("/").adapter.rooms.get(roomID)).reduce((acc, curr) =>
-    {acc && activeUsers[io.sockets.sockets.get(curr).data.id]["ready"]}, true);
+function startRoom(roomID){
+    io.to(roomID).emit("gamestart")
+    console.log("starting room: "+ roomID)
+    getAllSocketsInRoom(roomID).forEach((socket) =>{
+        activeUsers[socket.data.id]["articleID"] = undefined
+        console.log("adding listener for article lock in for socket: " + socket.data.id)
+        socket.on("lockinarticle", (articleID)=>{
+            activeUsers[socket.data.id]["articleID"] = articleID
+            console.log("socket "+ socket.data.id + " has locked in the article " + articleID)
+        })
+    })
 }
+
+//HELPER FUNCTIONS
 
 function generateNextLobbyID(){
     //TODO: Hash lobby id
@@ -75,5 +91,16 @@ function generateNextLobbyID(){
     console.log("new lobby id created: " + lobbyCounter)
     return lobbyCounter.toString()
 }
-
+function checkAllSocketsReady(roomID){
+    //TODO clean up this mess. very messy way of checking if all users are ready
+    return getAllSocketsInRoom(roomID).reduce((acc, curr) =>
+    {return (acc && activeUsers[curr.data.id]["ready"])}, true);
+}
+function getAllSocketsInRoom(roomID){
+    //Do not use this as a variable or assign it to something, this is a temporary freezeframe.
+    //if the sockets in the room change, the function return does not
+    return Array.from(io.of("/").adapter.rooms.get(roomID)).map((socketID) => {
+        return io.sockets.sockets.get(socketID);
+    });
+}
 server.listen(3000)
