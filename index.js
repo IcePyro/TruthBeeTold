@@ -4,19 +4,24 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-var activeUsers = new Map()
+var activeUsers = new Map() //this should probably be a DB later
 var lobbyCounter = 0
-var lobbysettings = new Map()
+var lobbysettings = new Map() //this should probably be a DB later
 
 app.get("/", (req,res) =>{
     res.sendFile(__dirname + "/index.html");
+    //TODO this should later be unnecessary, and be replaced by a single page application or a mobile app
 })
 
 io.on("connection", (socket) => {
     socket.emit("requestid")
     console.log("new user connected, requesting id")
     socket.once("id", (id) =>{
-        socket.data.id = id;
+        //on request ID the connected socket should submit an unique identifier. this is to be able to
+        //reconnect and identify users that reload their page etc. otherwise user specific information
+        //would be connected only to their socket, so reloading the page would make the server think
+        //that a completly new user has connected
+        socket.data.id = id; //this connects the id to the current socket, so it is easy to fetch data from the DB
         activeUsers[socket.data.id] = {}
         console.log("id sent by new user: " + id)
         createOrJoin(socket)
@@ -28,6 +33,10 @@ function createOrJoin(socket){
         socket.removeAllListeners("joinlobby")
         socket.emit("requestsettings")
         socket.once("settings", (settings) =>{
+            //this information should be in a map, as (String, String) key-value-pairs.
+            //it should contain atleast max players and article read time.
+            //possible future settings: category of articles, language of articles, gamemodes
+            //e.g. chance no one has read the article, teams
             const lobbyID = generateNextLobbyID()
             socket.rooms.clear()
             socket.join(lobbyID)
@@ -41,7 +50,8 @@ function createOrJoin(socket){
         if(io.sockets.adapter.rooms.has(lobbyid)){
             socket.removeAllListeners("createlobby")
             socket.removeAllListeners("joinlobby")
-            socket.rooms.clear()
+            socket.rooms.clear() //socket is always in a room with its own socketID. this just removes
+                                 //it, so it only is in a lobby with itself
             socket.join(lobbyid)
             lobby(socket)
         }else{
@@ -59,8 +69,6 @@ function lobby(socket){
     socket.on("toggleready",()=>{
         activeUsers[socket.data.id]["ready"] = !(activeUsers[socket.data.id]["ready"])
         console.log("user " + socket.data.id + " ready: " + activeUsers[socket.data.id]["ready"])
-
-        //TODO Add check for atleast 3 Sockets, as that is the minimum required amount of players
         const roomID = socket.rooms.keys().next().value;
         let allSocketsReady = checkAllSocketsReady(roomID);
         console.log(allSocketsReady);
@@ -95,11 +103,12 @@ function generateNextLobbyID(){
 }
 function checkAllSocketsReady(roomID){
     //TODO clean up this mess. very messy way of checking if all users are ready
+    //TODO Add check for atleast 3 Sockets, as that is the minimum required amount of players
     return getAllSocketsInRoom(roomID).reduce((acc, curr) =>
     {return (acc && activeUsers[curr.data.id]["ready"])}, true);
 }
 function getAllSocketsInRoom(roomID){
-    //Do not use this as a variable or assign it to something, this is a temporary freezeframe.
+    //Do not use this as a variable or to assign it to something, this is a temporary freezeframe.
     //if the sockets in the room change, the function return does not
     return Array.from(io.of("/").adapter.rooms.get(roomID)).map((socketID) => {
         return io.sockets.sockets.get(socketID);
