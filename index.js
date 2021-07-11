@@ -105,8 +105,9 @@ function generateNextLobbyID(){
 function checkAllSocketsReady(roomID){
     //TODO clean up this mess. very messy way of checking if all users are ready
     //TODO Add check for atleast 3 Sockets, as that is the minimum required amount of players
-    return getAllSocketsInRoom(roomID).reduce((acc, curr) =>
-    {return (acc && activeUsers[curr.data.id]["ready"])}, true);
+    return getAllSocketsInRoom(roomID).reduce((acc, curr) => {
+        return (acc && activeUsers[curr.data.id]["ready"])
+    }, true);
 }
 function getAllSocketsInRoom(roomID){
     //Do not use this as a variable or to assign it to something, this is a temporary freezeframe.
@@ -115,4 +116,10 @@ function getAllSocketsInRoom(roomID){
         return io.sockets.sockets.get(socketID);
     });
 }
-server.listen(3000)
+function checkAllSocketsArticleLock(roomID){
+    return getAllSocketsInRoom(roomID).reduce((acc, curr) => {
+        return acc && !(activeUsers[curr.data.id]["articleID"] === undefined);
+    },true)
+}
+
+server.listen(3000);
