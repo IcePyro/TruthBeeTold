@@ -2,9 +2,10 @@
   "name": "truthbeetold",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "ts-node index.ts",
+    "lint": "eslint . --ext .ts"
   },
   "keywords": [],
   "author": "Louis Haub",
@@ -12,5 +13,15 @@
   "dependencies": {
     "express": "^4.17.1",
     "socket.io": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.3.1",
+    "@types/socket.io": "^3.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
+    "eslint": "^7.30.0",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
   }
 }
