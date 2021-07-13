@@ -12,12 +12,12 @@ interface User {
 }
 
 interface LobbySettings {
-
+  any // TODO specify
 }
 
-let activeUsers: {[key: number]: User} = {}; //this should probably be a DB later
+const activeUsers: {[key: number]: User} = {}; //this should probably be a DB later
 let lobbyCounter = 0;
-let lobbysettings: {[key: string]: LobbySettings} = {}; //this should probably be a DB later
+const lobbysettings: {[key: string]: LobbySettings} = {}; //this should probably be a DB later
 
 app.get("/", (req,res) =>{
     res.sendFile(__dirname + "/index.html");
@@ -56,7 +56,7 @@ function createOrJoin(socket: Socket) {
             lobby(socket)
         })
     });
-    socket.on("joinlobby", (lobbyid: string)=>{
+    socket.on("joinlobby", (lobbyid: string) => {
         console.log("user with id: '" + socket.data.id + "' is trying to join lobby with the lobbyid: '" + lobbyid + "'");
         if(io.sockets.adapter.rooms.has(lobbyid)){
             socket.removeAllListeners("createlobby");
@@ -77,11 +77,11 @@ function lobby(socket: Socket) {
     activeUsers[socket.data.id].ready = false;
     console.log("socket joined lobby: " + socket.rooms.keys().next().value);
     console.log(lobbysettings);
-    socket.on("toggleready",()=>{
+    socket.on("toggleready",() => {
         activeUsers[socket.data.id].ready = !activeUsers[socket.data.id].ready;
         console.log("user " + socket.data.id + " ready: " + activeUsers[socket.data.id].ready);
         const roomID = socket.rooms.keys().next().value;
-        let allSocketsReady = checkAllSocketsReady(roomID);
+        const allSocketsReady = checkAllSocketsReady(roomID);
         console.log(allSocketsReady);
         if(allSocketsReady){
             startRoom(roomID);
@@ -92,7 +92,7 @@ function lobby(socket: Socket) {
 function startRoom(roomID: string){
     io.to(roomID).emit("gamestart");
     console.log("starting room: "+ roomID);
-    getAllSocketsInRoom(roomID).forEach((socket) =>{
+    getAllSocketsInRoom(roomID).forEach((socket) => {
         //TODO remove lockin listeners
         activeUsers[socket.data.id].articleID = undefined;
         console.log("adding listener for article lock in for socket: " + socket.data.id);
