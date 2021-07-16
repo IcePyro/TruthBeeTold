@@ -8,6 +8,9 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "quotes": ["warn", "single"]
+    "quotes": ["warn", "single"],
+    "semi": ["error", "always"],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off"
   }
 }

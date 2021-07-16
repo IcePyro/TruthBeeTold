@@ -2,9 +2,14 @@ import * as express from 'express';
 import * as http from 'http';
 import { Server, Socket } from "socket.io";
 
+const port = parseInt(process.env.PORT || '3000');
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: process.env.CLIENT ||'http://localhost:1234'
+    }
+});
 
 interface User {
     ready?: boolean;
@@ -20,11 +25,6 @@ interface LobbySettings {
 const activeUsers: {[key: number]: User} = {}; //this should probably be a DB later
 let lobbyCounter = 0;
 const lobbysettings: {[key: string]: LobbySettings} = {}; //this should probably be a DB later
-
-app.get("/", (req,res) =>{
-    res.sendFile(__dirname + "/index.html");
-    //TODO this should later be unnecessary, and be replaced by a single page application or a mobile app
-});
 
 io.on("connection", (socket) => {
     socket.emit("requestid");
@@ -199,4 +199,4 @@ function getPlayerListWithBee(roomID, queenID){
     })
 }
 
-server.listen(3000);
+io.listen(port);
