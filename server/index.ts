@@ -75,9 +75,8 @@ function constructSession(socket: Socket) {
 }
 
 function createOrJoin(socket: Socket) {
-    socket.once("createlobby", (username) => {
+    socket.once("createlobby", () => {
         console.log("user with id: '" + socket.data.id + "' is creating a new lobby");
-        activeUsers[socket.data.id].username = username; //TODO emit error if username is empty
         socket.removeAllListeners("joinlobby");
         socket.emit("requestsettings");
         socket.once("settings", (settings: LobbySettings) => {
@@ -92,10 +91,9 @@ function createOrJoin(socket: Socket) {
             lobby(socket);
         });
     });
-    socket.on("joinlobby", (lobbyid: string, username) => {
+    socket.on("joinlobby", (lobbyid: string) => {
         console.log("user with id: '" + socket.data.id + "' is trying to join lobby with the lobbyid: '" + lobbyid + "'");
         if (io.sockets.adapter.rooms.has(lobbyid)) {
-            activeUsers[socket.data.id].username = username; //TODO emit error if username is empty
             socket.removeAllListeners("createlobby");
             socket.removeAllListeners("joinlobby");
             socket.rooms.clear();//socket is always in a room with its own socketID. this just removes

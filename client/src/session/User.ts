@@ -34,6 +34,10 @@ export default class User {
     return this._socket;
   }
 
+  @action setUsername(username: string) {
+    this.username = username;
+  }
+
   /**
    * Create connection with server.
    * Tries to pass existing token, if none exists it waits for the server to assign one

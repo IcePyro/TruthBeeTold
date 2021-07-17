@@ -1,16 +1,11 @@
 import {action, makeAutoObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React from 'react';
-import OtherUser from '../game/OtherUser';
 
 class LobbyModel {
-  @observable otherUsers: OtherUser[] = [];
 
   constructor() { makeAutoObservable(this); }
 
-  @action addOtherUser(otherUser: OtherUser) {
-    this.otherUsers.push(otherUser);
-  }
 }
 
 @observer
