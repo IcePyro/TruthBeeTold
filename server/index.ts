@@ -58,6 +58,7 @@ function constructSession(socket: Socket) {
     if (token && session) {  // If session is present send old session and user data
         socket.data.id = session.userid;
         const user = activeUsers[session.userid];
+        user.socket = socket;
         socket.emit('reconstruct-session', {user: {id: session.userid, ready: user.ready, articleID: user.articleID, username: user.username}});  // TODO don't reiterate interface
         console.log(`Reconstructed session for user ${session.userid}`);
     } else {  // If no session is present create a new one
