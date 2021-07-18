@@ -1,10 +1,11 @@
+import {StateID} from "./state-updater";
+
 const helper = require('../helper-functions')
 const stateNameToID = require("./state-updater").stateNameToID
 const updateUserState = require("./state-updater").updateUserState
 const stateUpdater = require("./state-updater")
 
 exports.init = function (io, activeUsers, userID, roomID){
-    activeUsers[userID].state = 1
     const articleSelectListener = (articleID) => {
         if(articleID){
             activeUsers[userID].articleID = articleID;
@@ -20,13 +21,13 @@ function junctionUsers(io, activeUsers, roomID){
     const queenID = helper.selectRandomQueen(io, roomID).data.id;
     const beeID = helper.selectRandomBee(io, roomID, queenID).data.id;
 
-    activeUsers[queenID].state = stateNameToID["queen"];
-    activeUsers[beeID].state = stateNameToID["bee"];
+    activeUsers[queenID].state = StateID.Queen;
+    activeUsers[beeID].state = StateID.Bee;
 
     helper.getAllSocketIDsInRoom(io, roomID).filter((curr) =>{
-        return !((curr == queenID) || (curr == beeID));
+        return !((curr === queenID) || (curr === beeID));
     }).forEach((curr) => {
-        activeUsers[curr].state = stateNameToID["wasp"];
+        activeUsers[curr].state = StateID.Wasp;
     })
     stateUpdater.updateMultipleUserStates(io, activeUsers, helper.getAllSocketIDsInRoom(io, roomID), roomID);
 }

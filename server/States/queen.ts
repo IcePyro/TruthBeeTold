@@ -1,11 +1,11 @@
 import {getAllSocketIDsInRoom} from "../helper-functions"
 import {updateMultipleUserStates} from "./state-updater";
-import {stateNameToID} from "./state-updater";
+import {StateID} from "./state-updater";
 
 exports.init = function (io, activeUsers, userID, roomID){
     activeUsers[userID].socket.emit("playerlist", generatePlayerList(io, activeUsers, roomID));
     const beeSelectListener = (selectedID) =>{
-        if(activeUsers[selectedID].state == stateNameToID["bee"]){
+        if(activeUsers[selectedID].state === StateID.Bee){
             console.log("beecorrect");
             io.to(roomID).emit("beecorrect");
         }else{
@@ -18,20 +18,20 @@ exports.init = function (io, activeUsers, userID, roomID){
 }
 function generatePlayerList(io, activeUsers, roomID){
     return getAllSocketIDsInRoom(io, roomID).filter((curr) =>{
-        return activeUsers[curr].state !== stateNameToID["queen"]
+        return activeUsers[curr].state !== StateID.Queen
     })
 }
 function junctionUsers(io, activeUsers, roomID){
     const userIDs = getAllSocketIDsInRoom(io, roomID);
 
     userIDs.filter((curr) => {
-        return activeUsers[curr].state !== stateNameToID["bee"];
+        return activeUsers[curr].state !== StateID.Bee;
     }).forEach((curr) => {
-        activeUsers[curr].state = stateNameToID["wait"];
+        activeUsers[curr].state = StateID.Wait;
     })
     activeUsers[userIDs.find((curr) => {
-        return activeUsers[curr].state == stateNameToID["bee"];
-    })].state = stateNameToID["articleselect"]
+        return activeUsers[curr].state === StateID.Bee;
+    })].state = StateID.ArticleSelect
 
     updateMultipleUserStates(io, activeUsers, userIDs, roomID)
 }

@@ -5,6 +5,7 @@ import * as crypto from 'crypto';
 
 require("dotenv").config();
 import {updateUserState} from "./States/state-updater";
+import {StateID} from "./States/state-updater";
 
 const port = parseInt(process.env.PORT || '3000');
 const app = express();
@@ -133,7 +134,7 @@ function startRoom(roomID: string) {
     io.to(roomID).emit("gamestart");
     console.log("starting room: " + roomID);
     getAllSocketsInRoom(roomID).forEach((socket) => {
-        activeUsers[socket.data.id].state = 1;
+        activeUsers[socket.data.id].state = StateID.ArticleSelect;
         updateUserState(io, activeUsers, socket.data.id, roomID)
     });
 }
@@ -162,4 +163,5 @@ function getAllSocketsInRoom(roomID: string): Socket[] {
     });
 }
 
-io.listen(port);
+//io.listen(port);
+server.listen(3000)

@@ -20,7 +20,7 @@ exports.selectRandomQueen = function (io, roomID) {
 exports.selectRandomBee = function (io, roomID, queenID) {
     const allSockets = exports.getAllSocketsInRoom(io, roomID);
     const allSocketsExceptQueen = allSockets.filter((curr) => {
-        return !(curr.data.id == queenID);
+        return !(curr.data.id === queenID);
     });
     return allSocketsExceptQueen[Math.floor(Math.random() * allSocketsExceptQueen.length)];
 }
