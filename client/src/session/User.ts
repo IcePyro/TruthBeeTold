@@ -47,6 +47,7 @@ export default class User {
     // @ts-ignore
     const s = io(process.env.SERVER || 'http://localhost:3000', {query: {token: tokenCookie}});
 
+
     s.on('construct-session', ({token, userId}: {token: string, userId: number}) => {
       Cookies.set('token', token);
       runInAction(() => {

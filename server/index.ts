@@ -4,6 +4,7 @@ import {Server, Socket} from "socket.io";
 import * as crypto from 'crypto';
 
 require("dotenv").config();
+import {updateUserState} from "./States/state-updater";
 
 const port = parseInt(process.env.PORT || '3000');
 const app = express();
@@ -19,6 +20,7 @@ interface User {
     articleID?: string;
     socket?: Socket;
     username?: string;
+    state?: number;
 }
 
 interface LobbySettings {
@@ -46,6 +48,10 @@ io.on("connection", (socket) => {
         console.log(`Socket ${socket.data.id} disconnected`);
     });
 });
+//TODO remove, only for testing
+app.get("/", (req,res) =>{
+    res.sendFile(__dirname + "/index.html");
+})
 
 /**
  * Try to reconstruct session for socket if possible or create a new one.
@@ -127,60 +133,8 @@ function startRoom(roomID: string) {
     io.to(roomID).emit("gamestart");
     console.log("starting room: " + roomID);
     getAllSocketsInRoom(roomID).forEach((socket) => {
-        //TODO remove lockin listeners
-        activeUsers[socket.data.id].articleID = undefined;
-        console.log("adding listener for article lock in for socket: " + socket.data.id);
-        //TODO Article lockin should be time limited
-        socket.on("lockinarticle", (articleID: string) => {
-            activeUsers[socket.data.id].articleID = articleID;
-            const allSocketsReady = checkAllSocketsArticleLock(roomID);
-            console.log("socket " + socket.data.id + " has locked in the article " + articleID);
-            if (allSocketsReady) {
-                getAllSocketsInRoom(roomID).forEach((curr) => {
-                    curr.removeAllListeners("lockinarticle");
-                });
-                selectQueenGL(roomID);
-            }
-        });
-    });
-}
-
-function selectQueenGL(roomID) {
-    const queenID = selectRandomQueen(roomID).data.id;
-    const beeID = selectRandomBee(roomID, queenID).data.id;
-    console.log("The chosen queen is: " + queenID);
-    console.log("The chosen bee is: " + beeID);
-    console.log("The article of the bee is: " + activeUsers[beeID].articleID);
-    io.to(roomID).emit("roundstart", activeUsers[beeID].articleID);
-    const playerListWithBee = getPlayerListWithBee(roomID, queenID);
-    console.log(playerListWithBee);
-    activeUsers[beeID].socket.emit("playerList", playerListWithBee.map((tuple) => {
-        return tuple[1];
-    }));
-    activeUsers[queenID].socket.once("beeselect", (selectedIndex) => {
-        const beeIndex = playerListWithBee.findIndex((curr) => curr[0] == beeID);
-        if (selectedIndex == beeIndex) {
-            io.to(roomID).emit("beecorrect");
-            console.log("correct bee");
-        } else {
-            io.to(roomID).emit("beefalse");
-            console.log("that was a wasp");
-        }
-        newBeeArticleGL(roomID, beeID);
-    });
-}
-
-function newBeeArticleGL(roomID, beeID) {
-    activeUsers[beeID].socket.on("lockinarticle", (articleID: string) => {
-        activeUsers[beeID].articleID = articleID;
-        const allSocketsReady = checkAllSocketsArticleLock(roomID);
-        console.log("socket " + beeID + " has locked in the article " + articleID);
-        if (allSocketsReady) {
-            getAllSocketsInRoom(roomID).forEach((curr) => {
-                curr.removeAllListeners("lockinarticle");
-            });
-            selectQueenGL(roomID);
-        }
+        activeUsers[socket.data.id].state = 1;
+        updateUserState(io, activeUsers, socket.data.id, roomID)
     });
 }
 
@@ -206,35 +160,6 @@ function getAllSocketsInRoom(roomID: string): Socket[] {
     return Array.from(io.of("/").adapter.rooms.get(roomID)).map((socketID) => {
         return io.sockets.sockets.get(socketID);
     });
-}
-
-function checkAllSocketsArticleLock(roomID: string): boolean {
-    return getAllSocketsInRoom(roomID).every(curr => {
-        return activeUsers[curr.data.id].articleID !== undefined;
-    });
-}
-
-function selectRandomQueen(roomID) {
-    const allSockets = getAllSocketsInRoom(roomID);
-    return allSockets[Math.floor(Math.random() * allSockets.length)];
-}
-
-function selectRandomBee(roomID, queenID) {
-    const allSockets = getAllSocketsInRoom(roomID);
-    const allSocketsExceptQueen = allSockets.filter((curr) => {
-        return !(curr.data.id == queenID);
-    });
-    return allSocketsExceptQueen[Math.floor(Math.random() * allSocketsExceptQueen.length)];
-}
-
-function getPlayerListWithBee(roomID, queenID) {
-    return getAllSocketsInRoom(roomID)
-        .filter((curr) => {
-            return !(curr.data.id == queenID);
-        })
-        .map((curr) => {
-            return [curr.data.id, curr.data.username];
-        });
 }
 
 io.listen(port);
