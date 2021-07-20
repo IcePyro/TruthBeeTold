@@ -1,4 +1,4 @@
-import {getAllSocketIDsInRoom} from "../helper-functions"
+import {getAllUserIDsInRoom} from "../helper-functions"
 import {updateMultipleUserStates} from "./state-updater";
 import {StateID} from "./state-updater";
 
@@ -17,12 +17,12 @@ exports.init = function (io, activeUsers, userID, roomID){
     activeUsers[userID].socket.once("beeselect", beeSelectListener)
 }
 function generatePlayerList(io, activeUsers, roomID){
-    return getAllSocketIDsInRoom(io, roomID).filter((curr) =>{
+    return getAllUserIDsInRoom(io, roomID).filter((curr) =>{
         return activeUsers[curr].state !== StateID.Queen
     })
 }
 function junctionUsers(io, activeUsers, roomID){
-    const userIDs = getAllSocketIDsInRoom(io, roomID);
+    const userIDs = getAllUserIDsInRoom(io, roomID);
 
     userIDs.filter((curr) => {
         return activeUsers[curr].state !== StateID.Bee;

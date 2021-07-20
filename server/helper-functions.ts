@@ -9,7 +9,7 @@ export const getAllSocketsInRoom = (io, roomID: string): Socket[] => {
         return io.sockets.sockets.get(socketID);
     });
 }
-export const getAllSocketIDsInRoom = (io, roomID) => {
+export const getAllUserIDsInRoom = (io, roomID) => {
     return exports.getAllSocketsInRoom(io, roomID).map((curr) => curr.data.id)
 }
 exports.selectRandomQueen = function (io, roomID) {

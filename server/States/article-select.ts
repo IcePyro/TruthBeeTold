@@ -24,12 +24,12 @@ function junctionUsers(io, activeUsers, roomID){
     activeUsers[queenID].state = StateID.Queen;
     activeUsers[beeID].state = StateID.Bee;
 
-    helper.getAllSocketIDsInRoom(io, roomID).filter((curr) =>{
+    helper.getAllUserIDsInRoom(io, roomID).filter((curr) =>{
         return !((curr === queenID) || (curr === beeID));
     }).forEach((curr) => {
         activeUsers[curr].state = StateID.Wasp;
     })
-    stateUpdater.updateMultipleUserStates(io, activeUsers, helper.getAllSocketIDsInRoom(io, roomID), roomID);
+    stateUpdater.updateMultipleUserStates(io, activeUsers, helper.getAllUserIDsInRoom(io, roomID), roomID);
 }
 
 function checkAllSocketsArticleLock(io, activeUsers, roomID: string): boolean {
