@@ -85,7 +85,7 @@ function createOrJoin(socket: Socket) {
     socket.once("createlobby", () => {
         console.log("user with id: '" + socket.data.id + "' is creating a new lobby");
         socket.removeAllListeners("joinlobby");
-        socket.emit("requestsettings");
+        socket.emit("requestsettings");  // TODO Currently ignored client side
         socket.once("settings", (settings: LobbySettings) => {
             //it should contain atleast max players and article read time.
             //possible future settings: category of articles, language of articles, gamemodes
