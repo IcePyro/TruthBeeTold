@@ -3,6 +3,7 @@ import PageModel from './PageModel';
 import {observer} from 'mobx-react';
 import {user} from '../session/User';
 import {action, makeAutoObservable, observable} from 'mobx';
+import ArticleView from '../components/ArticleView';
 
 class QueenModel {
   constructor() {makeAutoObservable(this);}
@@ -39,9 +40,15 @@ export default class Queen extends React.Component<QueenProps> {
   }
 
   render() {
-    const players = this.model.players.map(player => <input type='radio' className='player-selection' name='players' value={player}/>);
+    const players = this.model.players.map(player => (
+      <div key={player}>
+        <span>{player}: </span>
+        <input type='radio' className='player-selection' name='players' value={player}/>
+      </div>
+    ));
     return (<div style={this.props.page.enabledStyle}>
       <h1>Yas Queen</h1>
+      <ArticleView />
       {players}
       <button onClick={() => this.selectPlayer()}>Submit</button>
     </div>);

@@ -7,6 +7,13 @@ import {user} from '../session/User';
 class LobbyModel {
   constructor() { makeAutoObservable(this); }
 
+  @observable id = -1;
+  @observable lobbyId = '';
+
+  @action setIdAndLobbyId(id: number, lobbyId: string) {
+    this.id = id;
+    this.lobbyId = lobbyId;
+  }
 }
 
 export interface LobbyProps {
@@ -19,8 +26,11 @@ export default class Lobby extends React.Component<LobbyProps> {
 
   constructor(props: any) {
     super(props);
-    user.socket.once('gamestart', () => {
+    user.socket.on('gamestart', () => {
       this.props.page.onNextPage(Page.Game);
+    });
+    user.socket.on('youridandlobby', ({id, lobbyId}: {id: number, lobbyId: string}) => {
+      this.model.setIdAndLobbyId(id, lobbyId);
     });
   }
 
@@ -31,6 +41,8 @@ export default class Lobby extends React.Component<LobbyProps> {
   render(): React.ReactNode {
     return (<div style={this.props.page.enabledStyle}>
       <h1>Lobby</h1>
+      <h2>Your id: {this.model.id}</h2>
+      <h2>Your Lobby: {this.model.lobbyId}</h2>
       <input type='checkbox' onChange={() => this.onToggleReady()}/>
     </div>);
   }

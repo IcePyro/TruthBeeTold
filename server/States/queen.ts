@@ -1,8 +1,11 @@
 import {getAllUserIDsInRoom} from "../helper-functions"
 import {updateMultipleUserStates} from "./state-updater";
 import {StateID} from "./state-updater";
+import {Server} from 'socket.io';
+import {User} from '../index';
 
-exports.init = function (io, activeUsers, userID, roomID){
+exports.init = function (io: Server, activeUsers: {[key: number]: User}, userID, roomID){
+    io.to(roomID).emit('selectedarticle', activeUsers[getAllUserIDsInRoom(io, roomID).find(user => activeUsers[user].state === StateID.Bee)].articleID);
     activeUsers[userID].socket.emit("playerlist", generatePlayerList(io, activeUsers, roomID));
     const beeSelectListener = (selectedID) =>{
         if(activeUsers[selectedID].state === StateID.Bee){

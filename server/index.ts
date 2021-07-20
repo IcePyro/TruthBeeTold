@@ -16,7 +16,7 @@ const io = new Server(server, {
     }
 });
 
-interface User {
+export interface User {
     ready?: boolean;
     articleID?: string;
     socket?: Socket;
@@ -118,10 +118,11 @@ function lobby(socket: Socket) {
     activeUsers[socket.data.id].ready = false;
     console.log("socket joined lobby: " + socket.rooms.keys().next().value);
     console.log(lobbysettings);
+    const roomID = socket.rooms.keys().next().value;
+    socket.emit('youridandlobby', {id: socket.data.id, lobbyId: roomID});
     socket.on("toggleready", () => {
         activeUsers[socket.data.id].ready = !activeUsers[socket.data.id].ready;
         console.log("user " + socket.data.id + " ready: " + activeUsers[socket.data.id].ready);
-        const roomID = socket.rooms.keys().next().value;
         const allSocketsReady = checkAllSocketsReady(roomID);
         console.log(allSocketsReady);
         if (allSocketsReady) {
