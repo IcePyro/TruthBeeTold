@@ -1,15 +1,23 @@
 import * as express from 'express';
-import * as http from 'http';
+import * as https from 'https';
+//import * as http from 'http';
 import {Server, Socket} from "socket.io";
 import * as crypto from 'crypto';
+import * as fs from 'fs';
 
 require("dotenv").config();
 import {updateUserState} from "./States/state-updater";
 import {StateID} from "./States/state-updater";
 
+const options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+}
+
 const port = parseInt(process.env.PORT || '3000');
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(options, app);
+//const server = http.createServer(options, app);
 const io = new Server(server, {
     cors: {
         origin: process.env.CLIENT || 'http://localhost:1234'
