@@ -46,7 +46,7 @@ export default class User {
     const tokenCookie = Cookies.get('token');  // Can be undefined
     // @ts-ignore
     const s = io(process.env.SERVER || 'http://localhost:3000', {query: {token: tokenCookie}});
-
+    console.log(process.env.SERVER);
 
     s.on('construct-session', ({token, userId}: {token: string, userId: number}) => {
       Cookies.set('token', token);
