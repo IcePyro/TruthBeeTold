@@ -10,14 +10,15 @@ import {updateUserState} from "./States/state-updater";
 import {StateID} from "./States/state-updater";
 
 const options = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
+    key: fs.readFileSync(process.env.KEYLOCATION),
+    cert: fs.readFileSync(process.env.CERTLOCATION)
 }
-
 const port = parseInt(process.env.PORT || '3000');
 const app = express();
-const server = https.createServer(options, app);
-//const server = http.createServer(options, app);
+//const server = http.createServer(app);
+const server = https.createServer(options, app)
+//console.log("options-key:" + options.key)
+console.log("key: " + process.env.KEYLOCATION)
 const io = new Server(server, {
     cors: {
         origin: process.env.CLIENT || 'http://localhost:1234'
