@@ -1,6 +1,6 @@
 import * as express from 'express';
-import * as https from 'https';
-//import * as http from 'http';
+//import * as https from 'https';
+import * as http from 'http';
 import {Server, Socket} from "socket.io";
 import * as crypto from 'crypto';
 import * as fs from 'fs';
@@ -9,16 +9,16 @@ require("dotenv").config();
 import {updateUserState} from "./States/state-updater";
 import {StateID} from "./States/state-updater";
 
-const options = {
+/*const options = {
     key: fs.readFileSync(process.env.KEYLOCATION),
     cert: fs.readFileSync(process.env.CERTLOCATION)
-}
+}*/
 const port = parseInt(process.env.PORT || '3000');
 const app = express();
-//const server = http.createServer(app);
-const server = https.createServer(options, app)
+const server = http.createServer(app);
+//const server = https.createServer(options, app)
 //console.log("options-key:" + options.key)
-console.log("key: " + process.env.KEYLOCATION)
+//console.log("key: " + process.env.KEYLOCATION)
 const io = new Server(server, {
     cors: {
         origin: process.env.CLIENT || 'http://localhost:1234'
@@ -31,9 +31,10 @@ export interface User {
     socket?: Socket;
     username?: string;
     state?: number;
+    roomID?: string;
 }
 
-interface LobbySettings {
+export interface LobbySettings {
     any // TODO specify
 }
 
@@ -46,13 +47,14 @@ let nextUserId = 0;
 const activeUsers: { [key: number]: User } = {}; //this should probably be a DB later
 
 let lobbyCounter = 0;
-const lobbysettings: { [key: string]: LobbySettings } = {}; //this should probably be a DB later
+export const lobbysettings: { [key: string]: LobbySettings } = {}; //this should probably be a DB later
 
 const sessions: { [key: string]: Session } = {};  // TODO this should also be a DB later
 
 io.on("connection", (socket) => {
     constructSession(socket);
-    createOrJoin(socket);
+    //createOrJoin(socket);
+    updateUserState(io, activeUsers, socket.data.id, activeUsers[socket.data.id].roomID)
 
     socket.on("disconnect", () => {
         console.log(`Socket ${socket.data.id} disconnected`);
@@ -87,6 +89,7 @@ function constructSession(socket: Socket) {
         socket.data.id = newUserId;
         socket.emit('construct-session', {token: newToken, userId: newUserId});
         console.log(`Created new user with id ${newUserId}`);
+        activeUsers[socket.data.id].state = StateID.Home;
     }
 }
 
