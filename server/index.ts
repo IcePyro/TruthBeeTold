@@ -25,6 +25,7 @@ const io = new Server(server, {
     }
 });
 
+
 export interface User {
     ready?: boolean;
     articleID?: string;
@@ -46,7 +47,6 @@ interface Session {
 let nextUserId = 0;
 const activeUsers: { [key: number]: User } = {}; //this should probably be a DB later
 
-let lobbyCounter = 0;
 export const lobbysettings: { [key: string]: LobbySettings } = {}; //this should probably be a DB later
 
 const sessions: { [key: string]: Session } = {};  // TODO this should also be a DB later
@@ -54,6 +54,10 @@ const sessions: { [key: string]: Session } = {};  // TODO this should also be a 
 io.on("connection", (socket) => {
     constructSession(socket);
     //createOrJoin(socket);
+    if(activeUsers[socket.data.id].roomID){
+        socket.join(activeUsers[socket.data.id].roomID);
+        console.log("rejoining user" + socket.data.id + " to room " + activeUsers[socket.data.id].roomID)
+    }
     updateUserState(io, activeUsers, socket.data.id, activeUsers[socket.data.id].roomID)
 
     socket.on("disconnect", () => {
@@ -91,89 +95,6 @@ function constructSession(socket: Socket) {
         console.log(`Created new user with id ${newUserId}`);
         activeUsers[socket.data.id].state = StateID.Home;
     }
-}
-
-function createOrJoin(socket: Socket) {
-    socket.once("createlobby", () => {
-        console.log("user with id: '" + socket.data.id + "' is creating a new lobby");
-        socket.removeAllListeners("joinlobby");
-        socket.emit("requestsettings");  // TODO Currently ignored client side
-        socket.once("settings", (settings: LobbySettings) => {
-            //it should contain atleast max players and article read time.
-            //possible future settings: category of articles, language of articles, gamemodes
-            //e.g. chance no one has read the article, teams
-            const lobbyID = generateNextLobbyID();
-            socket.rooms.clear();
-            socket.join(lobbyID);
-            console.log(socket.rooms);
-            lobbysettings[lobbyID] = settings;
-            lobby(socket);
-        });
-    });
-    socket.on("joinlobby", (lobbyid: string) => {
-        console.log("user with id: '" + socket.data.id + "' is trying to join lobby with the lobbyid: '" + lobbyid + "'");
-        if (io.sockets.adapter.rooms.has(lobbyid)) {
-            socket.removeAllListeners("createlobby");
-            socket.removeAllListeners("joinlobby");
-            socket.rooms.clear();//socket is always in a room with its own socketID. this just removes
-                                 //it, so it only is in a lobby with itself
-            socket.join(lobbyid);
-            lobby(socket);
-        } else {
-            console.log("requested lobby not found");
-            socket.emit("lobbynotfound");
-        }
-    });
-}
-
-function lobby(socket: Socket) {
-    activeUsers[socket.data.id].ready = false;
-    console.log("socket joined lobby: " + socket.rooms.keys().next().value);
-    console.log(lobbysettings);
-    const roomID = socket.rooms.keys().next().value;
-    socket.emit('youridandlobby', {id: socket.data.id, lobbyId: roomID});
-    socket.on("toggleready", () => {
-        activeUsers[socket.data.id].ready = !activeUsers[socket.data.id].ready;
-        console.log("user " + socket.data.id + " ready: " + activeUsers[socket.data.id].ready);
-        const allSocketsReady = checkAllSocketsReady(roomID);
-        console.log(allSocketsReady);
-        if (allSocketsReady) {
-            startRoom(roomID);
-        }
-    });
-}
-
-function startRoom(roomID: string) {
-    io.to(roomID).emit("gamestart");
-    console.log("starting room: " + roomID);
-    getAllSocketsInRoom(roomID).forEach((socket) => {
-        activeUsers[socket.data.id].state = StateID.ArticleSelect;
-        updateUserState(io, activeUsers, socket.data.id, roomID)
-    });
-}
-
-//HELPER FUNCTIONS
-
-function generateNextLobbyID(): string {
-    //TODO: Hash lobby id
-    lobbyCounter += 1;
-    console.log("new lobby id created: " + lobbyCounter);
-    return lobbyCounter.toString();
-}
-
-function checkAllSocketsReady(roomID: string): boolean {
-    //TODO Add check for atleast 3 Sockets, as that is the minimum required amount of players
-    return getAllSocketsInRoom(roomID).every(curr => {
-        return activeUsers[curr.data.id].ready;
-    });
-}
-
-function getAllSocketsInRoom(roomID: string): Socket[] {
-    //Do not use this as a variable or to assign it to something, this is a temporary freezeframe.
-    //if the sockets in the room change, the function return does not
-    return Array.from(io.of("/").adapter.rooms.get(roomID)).map((socketID) => {
-        return io.sockets.sockets.get(socketID);
-    });
 }
 
 //io.listen(port);

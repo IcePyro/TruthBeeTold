@@ -17,6 +17,8 @@ exports.init = function (io, activeUsers, userID, roomID){
             activeUsers[userID].socket.rooms.clear();
             activeUsers[userID].socket.join(joinRoomID);
 
+
+            activeUsers[userID].roomID = joinRoomID;
             activeUsers[userID].socket.emit("joinlobbysuccess", true);
             activeUsers[userID].socket.state = StateID.Lobby
             updateUserState(io, activeUsers, userID, joinRoomID)

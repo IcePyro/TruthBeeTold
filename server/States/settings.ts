@@ -8,6 +8,7 @@ export function init(io, activeUsers, userID, roomID){
         const lobbyID = generateNextLobbyID();
         activeUsers[userID].socket.rooms.clear();
         activeUsers[userID].socket.join(lobbyID);
+        activeUsers[userID].roomID = lobbyID;
         lobbysettings[lobbyID] = settings;
 
         activeUsers[userID].state = StateID.Lobby;
