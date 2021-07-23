@@ -1,8 +1,8 @@
-import {action, makeAutoObservable, observable } from 'mobx';
-import { observer } from 'mobx-react';
+import {action, makeAutoObservable, observable} from 'mobx';
+import {observer} from 'mobx-react';
 import React from 'react';
-import PageModel, {Page} from './PageModel';
 import {user} from '../session/User';
+import {StateComponent} from '../StateModel';
 
 class LobbyModel {
   constructor() { makeAutoObservable(this); }
@@ -16,19 +16,12 @@ class LobbyModel {
   }
 }
 
-export interface LobbyProps {
-  page: PageModel;
-}
-
 @observer
-export default class Lobby extends React.Component<LobbyProps> {
+export default class Lobby extends StateComponent {
   private model = new LobbyModel();
 
   constructor(props: any) {
     super(props);
-    user.socket.on('gamestart', () => {
-      this.props.page.onNextPage(Page.Game);
-    });
     user.socket.on('youridandlobby', ({id, lobbyId}: {id: number, lobbyId: string}) => {
       this.model.setIdAndLobbyId(id, lobbyId);
     });
@@ -39,7 +32,7 @@ export default class Lobby extends React.Component<LobbyProps> {
   }
 
   render(): React.ReactNode {
-    return (<div style={this.props.page.enabledStyle}>
+    return (<div style={this.props.stateModel.enabledStyle}>
       <h1>Lobby</h1>
       <h2>Your id: {this.model.id}</h2>
       <h2>Your Lobby: {this.model.lobbyId}</h2>

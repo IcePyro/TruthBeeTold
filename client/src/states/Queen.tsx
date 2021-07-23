@@ -1,9 +1,9 @@
 import React from 'react';
-import PageModel from './PageModel';
 import {observer} from 'mobx-react';
 import {user} from '../session/User';
 import {action, makeAutoObservable, observable} from 'mobx';
 import ArticleView from '../components/ArticleView';
+import {StateComponent} from '../StateModel';
 
 class QueenModel {
   constructor() {makeAutoObservable(this);}
@@ -15,12 +15,8 @@ class QueenModel {
   }
 }
 
-export interface QueenProps {
-  page: PageModel;
-}
-
 @observer
-export default class Queen extends React.Component<QueenProps> {
+export default class Queen extends StateComponent {
   private model = new QueenModel();
 
   constructor(props: any) {
@@ -46,7 +42,7 @@ export default class Queen extends React.Component<QueenProps> {
         <input type='radio' className='player-selection' name='players' value={player}/>
       </div>
     ));
-    return (<div style={this.props.page.enabledStyle}>
+    return (<div style={this.props.stateModel.enabledStyle}>
       <h1>Yas Queen</h1>
       <ArticleView />
       {players}

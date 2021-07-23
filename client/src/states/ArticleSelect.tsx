@@ -1,14 +1,10 @@
 import React from 'react';
-import PageModel from './PageModel';
 import {user} from '../session/User';
 import {observer} from 'mobx-react';
-
-export interface ArticleSelectProps {
-  page: PageModel;
-}
+import {StateComponent} from '../StateModel';
 
 @observer
-export default class ArticleSelect extends React.Component<ArticleSelectProps> {
+export default class ArticleSelect extends StateComponent {
   private selectArticle() {
     const input = document.getElementById('article-select') as HTMLInputElement;
     if (input.value) {
@@ -17,7 +13,7 @@ export default class ArticleSelect extends React.Component<ArticleSelectProps> {
   }
 
   render() {
-    return (<div style={this.props.page.enabledStyle}>
+    return (<div style={this.props.stateModel.enabledStyle}>
       <h1>Select Article</h1>
       <input type='text' id='article-select'/>
       <button onClick={() => this.selectArticle()}>Submit</button>
