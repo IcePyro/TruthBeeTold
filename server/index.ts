@@ -1,39 +1,9 @@
-import * as express from 'express';
-//import * as https from 'https';
-import * as http from 'http';
-import {Server, Socket} from "socket.io";
+import {Socket} from "socket.io";
 import * as crypto from 'crypto';
-import * as fs from 'fs';
+import {StateID, updateUserState} from "./States/state-updater";
+import {io} from './session';
+import {activeUsers, getNextUserId, User} from './types/User';
 
-require("dotenv").config();
-import {updateUserState} from "./States/state-updater";
-import {StateID} from "./States/state-updater";
-
-/*const options = {
-    key: fs.readFileSync(process.env.KEYLOCATION),
-    cert: fs.readFileSync(process.env.CERTLOCATION)
-}*/
-const port = parseInt(process.env.PORT || '3000');
-const app = express();
-const server = http.createServer(app);
-//const server = https.createServer(options, app)
-//console.log("options-key:" + options.key)
-//console.log("key: " + process.env.KEYLOCATION)
-const io = new Server(server, {
-    cors: {
-        origin: process.env.CLIENT || 'http://localhost:1234'
-    }
-});
-
-
-export interface User {
-    ready?: boolean;
-    articleID?: string;
-    socket?: Socket;
-    username?: string;
-    state?: number;
-    roomID?: string;
-}
 
 export interface LobbySettings {
     any // TODO specify
@@ -44,8 +14,6 @@ interface Session {
     constructed: number;
 }
 
-let nextUserId = 0;
-const activeUsers: { [key: number]: User } = {}; //this should probably be a DB later
 
 export const lobbysettings: { [key: string]: LobbySettings } = {}; //this should probably be a DB later
 
@@ -64,10 +32,9 @@ io.on("connection", (socket) => {
         console.log(`Socket ${socket.data.id} disconnected`);
     });
 });
-//TODO remove, only for testing
-app.get("/", (req,res) =>{
-    res.sendFile(__dirname + "/index.html");
-})
+// app.get("/", (req,res) =>{
+//     res.sendFile(__dirname + "/index.html");
+// })
 
 /**
  * Try to reconstruct session for socket if possible or create a new one.
@@ -85,8 +52,8 @@ function constructSession(socket: Socket) {
         console.log(`Reconstructed session for user ${session.userid}`);
     } else {  // If no session is present create a new one
         const newToken = crypto.randomBytes(16).toString('base64');
-        const newUser: User = {socket};
-        const newUserId = nextUserId++;
+        const newUser = new User(socket);
+        const newUserId = getNextUserId();
         const newSession: Session = {constructed: Date.now(), userid: newUserId};
         activeUsers[newUserId] = newUser;
         sessions[newToken] = newSession;
@@ -96,6 +63,3 @@ function constructSession(socket: Socket) {
         activeUsers[socket.data.id].state = StateID.Home;
     }
 }
-
-//io.listen(port);
-server.listen(3000)

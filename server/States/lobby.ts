@@ -1,27 +1,39 @@
-import {lobbysettings} from "../index";
-import {getAllUserIDsInRoom} from "../helper-functions";
 import {StateID, updateUserState} from "./state-updater";
+import Room from '../types/Room';
+import {activeUsers} from '../types/User';
+import {io} from '../session';
 
-export function init(io, activeUsers, userID, roomID){
+export function init(iio, activeUserss, userID, roomID){
     activeUsers[userID].ready = false;
     console.log("socket joined lobby: " + roomID);
-    console.log(lobbysettings);
-    activeUsers[userID].socket.emit('youridandlobby', {id: userID, lobbyId: roomID});
-    activeUsers[userID].socket.on("toggleready", () => {
-        activeUsers[userID].ready = !activeUsers[userID].ready;
-        console.log("user " + userID + " ready: " + activeUsers[userID].ready);
-        const allSocketsReady = checkAllSocketsReady(io,activeUsers, roomID);
-        console.log("All sockets in room " + roomID + "ready:" + allSocketsReady);
-        if (allSocketsReady) {
-            getAllUserIDsInRoom(io, roomID).forEach((curr) => {
-                activeUsers[curr].state = StateID.ArticleSelect
-                updateUserState(io, activeUsers, curr, roomID)
-            })
+
+    const user = activeUsers[userID];
+    const room = Room.byId(roomID);
+
+    user.socket.emit('lobbydata', {
+        username: user.username,
+        users: room.usersWithout(user).map(user => ({userid: user.id, username: user.username, ready: user.ready}))
+    });
+    room.emitAllWithout(user, 'userjoin', {userid: user.id, username: user.username});
+
+    user.socket.on('setusername', (username: string) => {
+        user.username = username;
+        console.log(`user ${user.id} is now called ${user.username}`);
+        room.emitAll('changedusername', {userid: user.id, username});
+    });
+
+    user.socket.on('toggleready', (ready: boolean) => {
+        user.ready = ready;
+        console.log(`user ${user.id} ready: ${user.ready}`);
+        const allReady = room.allReady;
+        console.log(`All sockets in room ${roomID} ready: ${allReady}`);
+        if (allReady) {
+            for (const user of room.users) {
+                user.state = StateID.ArticleSelect
+                updateUserState(io, activeUsers, user.id, roomID)
+            }
+        } else {
+            room.emitAll('toggledready', {userid: user.id, ready});
         }
     });
-}
-function checkAllSocketsReady(io,activeUsers, roomID: string): boolean {
-    //TODO Add check for atleast 3 Sockets, as that is the minimum required amount of players
-    const allUserIDs = getAllUserIDsInRoom(io, roomID);
-    return (allUserIDs.every(curr => {return activeUsers[curr].ready;}) && allUserIDs.size >= 3);
 }

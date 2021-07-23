@@ -19,8 +19,7 @@ exports.init = function (io, activeUsers, userID, roomID){
 
 
             activeUsers[userID].roomID = joinRoomID;
-            activeUsers[userID].socket.emit("joinlobbysuccess", true);
-            activeUsers[userID].socket.state = StateID.Lobby
+            activeUsers[userID].state = StateID.Lobby
             updateUserState(io, activeUsers, userID, joinRoomID)
         } else {
             console.log("requested lobby not found");

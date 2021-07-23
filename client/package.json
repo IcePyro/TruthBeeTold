@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^2.2.7",
+    "@types/lodash": "^4.14.171",
     "@types/node": "^16.3.2",
     "@types/react": "^17.0.14",
     "@types/react-dom": "^17.0.9",
@@ -34,6 +35,7 @@
   },
   "dependencies": {
     "js-cookie": "^2.2.1",
+    "lodash": "^4.17.21",
     "mobx": "^6.3.2",
     "mobx-react": "^7.2.0",
     "parcel-bundler": "^1.12.5",
