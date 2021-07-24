@@ -7,8 +7,8 @@ import {ReadonlyReady} from './ReadonlyReady';
 export const UsersHaveArticleView: React.FC = observer(() => {
   return (
     <>
-      { game.otherUsers.users.map(user => {
-        return <div>
+      { game.otherUsers.users.map((user, i) => {
+        return <div key={i}>
           <span>{ user.username }</span>
           <ReadonlyReady ready={user.hasArticle} />
         </div>;
