@@ -3,18 +3,18 @@ import {updateMultipleUserStates} from "./state-updater";
 import {StateID} from "./state-updater";
 import {Server} from 'socket.io';
 import {User} from '../types/User';
+import Room from '../types/Room';
 
 exports.init = function (io: Server, activeUsers: {[key: number]: User}, userID, roomID){
+    const room = Room.byId(roomID);
+
     io.to(roomID).emit('selectedarticle', activeUsers[getAllUserIDsInRoom(io, roomID).find(user => activeUsers[user].state === StateID.Bee)].articleID);
     activeUsers[userID].socket.emit("playerlist", generatePlayerList(io, activeUsers, roomID));
-    const beeSelectListener = (selectedID) =>{
-        if(activeUsers[selectedID].state === StateID.Bee){
-            console.log("beecorrect");
-            io.to(roomID).emit("beecorrect");
-        }else{
-            console.log("beefalse");
-            io.to(roomID).emit("beefalse");
-        }
+    const beeSelectListener = (selectedId: number) =>{
+        const correct = activeUsers[selectedId].state === StateID.Bee;
+        const actualBee = room.bee;
+        console.log(`Bee selected. Correct: ${correct}. Selected: ${selectedId}. Actual Bee: ${actualBee.id}`)
+        io.to(roomID).emit("beeselected", {queen: userID, selected: selectedId, bee: actualBee.id, correct});
         junctionUsers(io, activeUsers, roomID)
     }
     activeUsers[userID].socket.once("beeselect", beeSelectListener)

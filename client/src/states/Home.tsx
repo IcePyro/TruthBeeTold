@@ -4,6 +4,7 @@ import {user} from '../session/User';
 import {observer} from 'mobx-react';
 import {action, computed, makeAutoObservable, observable} from 'mobx';
 import {StateComponent} from '../StateModel';
+import {game} from '../game/Game';
 
 class HomeModel {
   constructor() {makeAutoObservable(this);}
@@ -24,6 +25,8 @@ export default class Home extends StateComponent {
   private model = new HomeModel();
 
   public componentDidMount() {
+    game.reset();
+
     const lobbyId = location.hash.substr(1);
     if (lobbyId) this.model.setLobbyId(lobbyId);
   }

@@ -3,9 +3,11 @@ import {observer} from 'mobx-react';
 import React, {ChangeEvent} from 'react';
 import {user} from '../session/User';
 import {StateComponent} from '../StateModel';
-import OtherUser, {otherUsers} from '../game/OtherUser';
+import OtherUser from '../game/OtherUser';
 import { debounce } from 'lodash';
 import ClipboardJS from 'clipboard';
+import OtherUserView from '../components/OtherUserView';
+import {game} from '../game/Game';
 
 class LobbyModel {
   constructor() { makeAutoObservable(this); }
@@ -29,12 +31,12 @@ export default class Lobby extends StateComponent {
     user.socket.on('lobbydata', (data: {lobbyId: string, username: string, users: Array<{userid: number, username: string, ready: boolean}>}) => {
       user.setUsername(data.username);
       const users = data.users.map(user => new OtherUser(user.userid, user.username, user.ready));
-      otherUsers.setUsers(users);
+      game.otherUsers.setUsers(users);
       this.model.setLobbyId(data.lobbyId);
     });
 
     user.socket.on('userjoin', (user: { userid: number, username: string }) => {
-      otherUsers.addUser(new OtherUser(user.userid, user.username));
+      game.otherUsers.addUser(new OtherUser(user.userid, user.username));
     });
 
     user.socket.on('changedusername', ({userid, username}: {userid: number, username: string}) => {
@@ -43,23 +45,23 @@ export default class Lobby extends StateComponent {
           console.error('Updating username did not succeed');
         }
       } else {
-        otherUsers.getUserWithId(userid)?.setUsername(username);
+        game.otherUsers.getUserWithId(userid)?.setUsername(username);
       }
     });
 
     user.socket.on('toggledready', ({userid, ready}: {userid: number, ready: boolean}) => {
       if (user.id === userid) {
-        if (user.ready !== ready) {
+        if (game.ownUser.ready !== ready) {
           console.error('Updating ready did not succeed');
         }
       } else {
-        otherUsers.getUserWithId(userid)?.setReady(ready);
+        game.otherUsers.getUserWithId(userid)?.setReady(ready);
       }
     });
   }
 
   private onToggleReady(e: ChangeEvent<HTMLInputElement>) {
-    user.ready = e.target.checked;
+    game.ownUser.ready = e.target.checked;
     user.socket.emit('toggleready', e.target.checked);
   }
 
@@ -87,7 +89,7 @@ export default class Lobby extends StateComponent {
       <input defaultValue={user.username} onChange={e => this.onUsernameChange(e)}/>
       <input type='checkbox' onChange={(e) => this.onToggleReady(e)}/>
       <h2>Other Users:</h2>
-      {otherUsers.views}
+      {game.otherUsers.users.map((user, i) => <OtherUserView otherUser={user} key={i} />)}
     </div>);
   }
 }

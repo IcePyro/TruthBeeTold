@@ -1,7 +1,8 @@
 import {action, computed, makeAutoObservable, observable} from 'mobx';
 import OtherUserView from '../components/OtherUserView';
+import {CommonUser} from './CommonUser';
 
-export default class OtherUser {
+export default class OtherUser implements CommonUser {
   constructor(id: number, username: string, ready = false) {
     this.id = id;
     this.username = username;
@@ -23,10 +24,7 @@ export default class OtherUser {
 }
 
 export class OtherUsers {
-  private static _instance = new OtherUsers();
-  public static get instance() { return OtherUsers._instance; }
-
-  private constructor() { makeAutoObservable(this); }
+  constructor() { makeAutoObservable(this); }
 
   @observable users: OtherUser[] = [];
 
@@ -53,6 +51,8 @@ export class OtherUsers {
   @computed get names(): string[] {
     return this.users.map(u => u.username);
   }
-}
 
-export const otherUsers = OtherUsers.instance;
+  @action reset() {
+    this.users = [];
+  }
+}

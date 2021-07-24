@@ -2,6 +2,7 @@ import React from 'react';
 import {user} from '../session/User';
 import {observer} from 'mobx-react';
 import {StateComponent} from '../StateModel';
+import {LastWinView} from '../components/LastWinView';
 
 @observer
 export default class ArticleSelect extends StateComponent {
@@ -14,6 +15,7 @@ export default class ArticleSelect extends StateComponent {
 
   render() {
     return (<div style={this.props.stateModel.enabledStyle}>
+      <LastWinView />
       <h1>Select Article</h1>
       <input type='text' id='article-select'/>
       <button onClick={() => this.selectArticle()}>Submit</button>

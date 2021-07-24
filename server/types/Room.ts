@@ -1,6 +1,7 @@
 import {Socket} from 'socket.io';
 import {io} from '../session';
 import {activeUsers, User} from './User';
+import {StateID} from '../States/state-updater';
 
 export default class Room {
     public static byId(id: string): Room {
@@ -23,12 +24,16 @@ export default class Room {
         return this.users.filter(otherUser => otherUser.id !== user.id);
     }
 
+    public get bee(): User | undefined {
+        return this.users.find(user => user.state === StateID.Bee);
+    }
+
     public get allReady(): boolean {
         return this.users.every(user => user.ready) && this.users.length >= 3;
     }
 
     public emitAll(event: string, data: any) {
-        this.users.forEach(user => user.socket.emit(event, data));
+        io.to(this.id).emit(event, data);
     }
 
     public emitAllWithout(user: User, event: string, data: any) {

@@ -3,21 +3,21 @@ import {observer} from 'mobx-react';
 import {user} from '../session/User';
 import ArticleView from '../components/ArticleView';
 import {StateComponent} from '../StateModel';
-import {otherUsers} from '../game/OtherUser';
+import {game} from '../game/Game';
 
 @observer
 export default class Queen extends StateComponent {
 
   private selectPlayer() {
     const players = Array.from(document.querySelectorAll('.player-selection')) as HTMLInputElement[];
-    const selectedPlayer = players.find(p => p.checked)?.value;
-    if (selectedPlayer !== null) {
+    const selectedPlayer = Number(players.find(p => p.checked)?.value);
+    if (selectedPlayer !== null && !Number.isNaN(selectedPlayer)) {
       user.socket.emit('beeselect', selectedPlayer);
     }
   }
 
   render() {
-    const players = otherUsers.users.map((user, index) => (
+    const players = game.otherUsers.users.map((user, index) => (
       <div key={index}>
         <span>{user.username}: </span>
         <input type='radio' className='player-selection' name='players' value={user.id}/>
