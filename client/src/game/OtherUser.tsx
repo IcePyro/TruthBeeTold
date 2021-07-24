@@ -28,26 +28,30 @@ export class OtherUsers {
 
   private constructor() { makeAutoObservable(this); }
 
-  @observable otherUsers: OtherUser[] = [];
+  @observable users: OtherUser[] = [];
 
   @action addUser(otherUser: OtherUser) {
-    this.otherUsers.push(otherUser);
+    this.users.push(otherUser);
   }
 
   @action setUsers(otherUsers: OtherUser[]) {
-    this.otherUsers = otherUsers;
+    this.users = otherUsers;
   }
 
   @action clear() {
-    this.otherUsers = [];
+    this.users = [];
   }
 
   @computed getUserWithId(id: number): OtherUser | undefined {
-    return this.otherUsers.find(user => user.id === id);
+    return this.users.find(user => user.id === id);
   }
 
   @computed get views(): JSX.Element[] {
-    return this.otherUsers.map((user, i) => <OtherUserView otherUser={user} key={i} />);
+    return this.users.map((user, i) => <OtherUserView otherUser={user} key={i} />);
+  }
+
+  @computed get names(): string[] {
+    return this.users.map(u => u.username);
   }
 }
 

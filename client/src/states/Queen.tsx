@@ -1,29 +1,12 @@
 import React from 'react';
 import {observer} from 'mobx-react';
 import {user} from '../session/User';
-import {action, makeAutoObservable, observable} from 'mobx';
 import ArticleView from '../components/ArticleView';
 import {StateComponent} from '../StateModel';
-
-class QueenModel {
-  constructor() {makeAutoObservable(this);}
-
-  @observable players: number[] = [];
-
-  @action setPlayers(players: number[]) {
-    this.players = players;
-  }
-}
+import {otherUsers} from '../game/OtherUser';
 
 @observer
 export default class Queen extends StateComponent {
-  private model = new QueenModel();
-
-  public componentDidMount() {
-    user.socket.on('playerlist', (players: number[]) => {
-      this.model.setPlayers(players);
-    });
-  }
 
   private selectPlayer() {
     const players = Array.from(document.querySelectorAll('.player-selection')) as HTMLInputElement[];
@@ -34,10 +17,10 @@ export default class Queen extends StateComponent {
   }
 
   render() {
-    const players = this.model.players.map(player => (
-      <div key={player}>
-        <span>{player}: </span>
-        <input type='radio' className='player-selection' name='players' value={player}/>
+    const players = otherUsers.users.map((user, index) => (
+      <div key={index}>
+        <span>{user.username}: </span>
+        <input type='radio' className='player-selection' name='players' value={user.id}/>
       </div>
     ));
     return (<div style={this.props.stateModel.enabledStyle}>

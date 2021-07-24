@@ -5,16 +5,14 @@ import {user} from '../session/User';
 import {StateComponent} from '../StateModel';
 import OtherUser, {otherUsers} from '../game/OtherUser';
 import { debounce } from 'lodash';
-import OtherUserView from '../components/OtherUserView';
+import ClipboardJS from 'clipboard';
 
 class LobbyModel {
   constructor() { makeAutoObservable(this); }
 
-  @observable id = -1;
   @observable lobbyId = '';
 
-  @action setIdAndLobbyId(id: number, lobbyId: string) {
-    this.id = id;
+  @action setLobbyId(lobbyId: string) {
     this.lobbyId = lobbyId;
   }
 }
@@ -26,10 +24,13 @@ export default class Lobby extends StateComponent {
   private model = new LobbyModel();
 
   public componentDidMount() {
-    user.socket.on('lobbydata', (data: {username: string, users: Array<{userid: number, username: string, ready: boolean}>}) => {
+    new ClipboardJS('#lobbyid', {text: () => this.lobbyUrl});
+
+    user.socket.on('lobbydata', (data: {lobbyId: string, username: string, users: Array<{userid: number, username: string, ready: boolean}>}) => {
       user.setUsername(data.username);
       const users = data.users.map(user => new OtherUser(user.userid, user.username, user.ready));
       otherUsers.setUsers(users);
+      this.model.setLobbyId(data.lobbyId);
     });
 
     user.socket.on('userjoin', (user: { userid: number, username: string }) => {
@@ -70,10 +71,18 @@ export default class Lobby extends StateComponent {
     }, Lobby.usernameDebounceTime)();
   }
 
+  private get lobbyUrl(): string {
+    const url = window.location.toString().split('#')[0];
+    const withoutSlash = url.endsWith('/') ? url.substr(0, url.length - 1) : url;
+    const withoutProtocol = withoutSlash.replace(/http(s?):\/\//, '');
+    return `${withoutProtocol}#${this.model.lobbyId}`;
+  }
+
   render(): React.ReactNode {
     return (<div style={this.props.stateModel.enabledStyle}>
       <h1>Lobby</h1>
-      <h2>Your Lobby: {this.model.lobbyId}</h2>
+      <h2>Your Lobby:</h2>
+      <a id='lobbyid'>{this.lobbyUrl}</a>
       <h2>Your username:</h2>
       <input defaultValue={user.username} onChange={e => this.onUsernameChange(e)}/>
       <input type='checkbox' onChange={(e) => this.onToggleReady(e)}/>

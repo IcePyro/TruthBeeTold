@@ -32,8 +32,7 @@ export default class Room {
     }
 
     public emitAllWithout(user: User, event: string, data: any) {
-        const users = this.usersWithout(user);
-        users.forEach(user => user.socket.emit(event, data));
+        this.usersWithout(user).forEach(user => user.socket.emit(event, data));
     }
 }
 

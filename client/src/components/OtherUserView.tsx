@@ -2,6 +2,8 @@ import {observer} from 'mobx-react';
 import OtherUser from '../game/OtherUser';
 import React from 'react';
 
+import '../styles/other-user-view.sass';
+
 export interface OtherUserViewProps {
   otherUser: OtherUser;
 }
@@ -12,7 +14,7 @@ export default class OtherUserView extends React.Component<OtherUserViewProps> {
     return (
       <div>
         <span>{ this.props.otherUser.username }</span>
-        <input type='checkbox' onClick={() => false} value={ this.props.otherUser.ready ? 1 : 0 }/>
+        <div className={ 'other-ready' + (this.props.otherUser.ready ? ' ready' : '')}/>
       </div>
     );
   }

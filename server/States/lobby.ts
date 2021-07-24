@@ -11,6 +11,7 @@ export function init(_1, _2, userID, roomID){
     const room = Room.byId(roomID);
 
     user.socket.emit('lobbydata', {
+        lobbyId: roomID,
         username: user.username,
         users: room.usersWithout(user).map(user => ({userid: user.id, username: user.username, ready: user.ready}))
     });
