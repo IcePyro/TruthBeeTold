@@ -1,16 +1,24 @@
 import {StateID} from "./state-updater";
+import {io} from '../session';
+import Room from '../types/Room';
+import {User} from '../types/User';
 
 const helper = require('../helper-functions')
 const stateNameToID = require("./state-updater").stateNameToID
 const updateUserState = require("./state-updater").updateUserState
 const stateUpdater = require("./state-updater")
 
-exports.init = function (io, activeUsers, userID, roomID){
+exports.init = function (_, activeUsers, userID, roomID){
+    const room = Room.byId(roomID);
+    const user = activeUsers[userID] as User;
+
     const articleSelectListener = (articleID) => {
         if(articleID){
-            activeUsers[userID].articleID = articleID;
+            user.articleID = articleID;
             if(checkAllSocketsArticleLock(io, activeUsers, roomID)){
                 junctionUsers(io, activeUsers, roomID)
+            } else {
+                room.emitAllWithout(user, 'lockedinarticle', userID);
             }
         }
     }

@@ -13,6 +13,7 @@ export default class OtherUser implements CommonUser {
   @observable id = -1;
   @observable username = '';
   @observable ready = false;
+  @observable hasArticle = false;
 
   @action setReady(ready: boolean) {
     this.ready = ready;
@@ -20,6 +21,10 @@ export default class OtherUser implements CommonUser {
 
   @action setUsername(username: string) {
     this.username = username;
+  }
+
+  @action setHasArticle(hasArticle: boolean) {
+    this.hasArticle = hasArticle;
   }
 }
 

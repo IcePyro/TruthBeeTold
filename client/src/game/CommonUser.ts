@@ -3,7 +3,6 @@ import {game} from './Game';
 export interface CommonUser {
   id?: number;
   ready?: boolean;
-  articleId?: string;
   username?: string;
 }
 

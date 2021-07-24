@@ -9,7 +9,6 @@ exports.init = function (io: Server, activeUsers: {[key: number]: User}, userID,
     const room = Room.byId(roomID);
 
     io.to(roomID).emit('selectedarticle', activeUsers[getAllUserIDsInRoom(io, roomID).find(user => activeUsers[user].state === StateID.Bee)].articleID);
-    activeUsers[userID].socket.emit("playerlist", generatePlayerList(io, activeUsers, roomID));
     const beeSelectListener = (selectedId: number) =>{
         const correct = activeUsers[selectedId].state === StateID.Bee;
         const actualBee = room.bee;

@@ -2,7 +2,8 @@ import {observer} from 'mobx-react';
 import OtherUser from '../game/OtherUser';
 import React from 'react';
 
-import '../styles/other-user-view.sass';
+import '../styles/readonly-ready.sass';
+import {ReadonlyReady} from './ReadonlyReady';
 
 export interface OtherUserViewProps {
   otherUser: OtherUser;
@@ -14,7 +15,7 @@ export default class OtherUserView extends React.Component<OtherUserViewProps> {
     return (
       <div>
         <span>{ this.props.otherUser.username }</span>
-        <div className={ 'other-ready' + (this.props.otherUser.ready ? ' ready' : '')}/>
+        <ReadonlyReady ready={this.props.otherUser.ready} />
       </div>
     );
   }

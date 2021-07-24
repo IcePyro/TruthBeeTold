@@ -24,6 +24,10 @@ export default class Room {
         return this.users.filter(otherUser => otherUser.id !== user.id);
     }
 
+    public usersInState(state: StateID): User[] {
+        return this.users.filter(user => user.state === state);
+    }
+
     public get bee(): User | undefined {
         return this.users.find(user => user.state === StateID.Bee);
     }
