@@ -1,4 +1,4 @@
-import StateModel, {StateComponent} from './StateModel';
+import StateModel from './StateModel';
 import Home from './states/Home';
 import Settings from './states/Settings';
 import Lobby from './states/Lobby';
@@ -7,7 +7,6 @@ import Queen from './states/Queen';
 import Bee from './states/Bee';
 import Wasp from './states/Wasp';
 import Wait from './states/Wait';
-import {user} from './session/User';
 
 export enum State {Home, Settings, Lobby,ArticleSelect, Queen, Bee, Wasp, Wait}
 
@@ -40,22 +39,21 @@ const ServerToClientStates: {[key: number]: number} = {
   7: State.Wait,
 };
 
-const StateComponents = {
-  [State.Home]: createFile(Home),
-  [State.Settings]: createFile(Settings),
-  [State.Lobby]: createFile(Lobby),
-  [State.ArticleSelect]: createFile(ArticleSelect),
-  [State.Queen]: createFile(Queen),
-  [State.Bee]: createFile(Bee),
-  [State.Wasp]: createFile(Wasp),
-  [State.Wait]: createFile(Wait),
-};
+const StateComponents: {[key: number]: {model: StateModel, element: JSX.Element}} = {};
+addFile(State.Home, Home);
+addFile(State.Settings, Settings);
+addFile(State.Lobby, Lobby);
+addFile(State.ArticleSelect, ArticleSelect);
+addFile(State.Queen, Queen);
+addFile(State.Bee, Bee);
+addFile(State.Wasp, Wasp);
+addFile(State.Wait, Wait);
 
-function createFile(Component: any): {model: StateModel, element: JSX.Element} {
+function addFile(state: State, Component: any) {
   const model = new StateModel();
-  return {
+  StateComponents[state] = {
     model,
-    element: <Component stateModel={model}/>
+    element: <Component stateModel={model} key={state}/>
   };
 }
 

@@ -47,7 +47,7 @@ export class OtherUsers {
   }
 
   @computed get views(): JSX.Element[] {
-    return this.otherUsers.map(user => <OtherUserView otherUser={user} />);
+    return this.otherUsers.map((user, i) => <OtherUserView otherUser={user} key={i} />);
   }
 }
 

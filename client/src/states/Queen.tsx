@@ -19,9 +19,7 @@ class QueenModel {
 export default class Queen extends StateComponent {
   private model = new QueenModel();
 
-  constructor(props: any) {
-    super(props);
-
+  public componentDidMount() {
     user.socket.on('playerlist', (players: number[]) => {
       this.model.setPlayers(players);
     });

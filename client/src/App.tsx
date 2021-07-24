@@ -28,8 +28,7 @@ class AppModel {
 export default class App extends React.Component {
   private model = new AppModel();
 
-  constructor(props: any) {
-    super(props);
+  public componentDidMount() {
     States.init();
 
     user.socket.on('statetransition', (state: number) => {

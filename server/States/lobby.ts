@@ -3,7 +3,7 @@ import Room from '../types/Room';
 import {activeUsers} from '../types/User';
 import {io} from '../session';
 
-export function init(iio, activeUserss, userID, roomID){
+export function init(_1, _2, userID, roomID){
     activeUsers[userID].ready = false;
     console.log("socket joined lobby: " + roomID);
 
@@ -14,6 +14,7 @@ export function init(iio, activeUserss, userID, roomID){
         username: user.username,
         users: room.usersWithout(user).map(user => ({userid: user.id, username: user.username, ready: user.ready}))
     });
+
     room.emitAllWithout(user, 'userjoin', {userid: user.id, username: user.username});
 
     user.socket.on('setusername', (username: string) => {

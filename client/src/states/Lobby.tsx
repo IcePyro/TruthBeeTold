@@ -25,9 +25,7 @@ export default class Lobby extends StateComponent {
 
   private model = new LobbyModel();
 
-  constructor(props: any) {
-    super(props);
-
+  public componentDidMount() {
     user.socket.on('lobbydata', (data: {username: string, users: Array<{userid: number, username: string, ready: boolean}>}) => {
       user.setUsername(data.username);
       const users = data.users.map(user => new OtherUser(user.userid, user.username, user.ready));

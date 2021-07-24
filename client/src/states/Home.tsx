@@ -23,9 +23,7 @@ class HomeModel {
 export default class Home extends StateComponent {
   private model = new HomeModel();
 
-  public constructor(props: any) {
-    super(props);
-
+  public componentDidMount() {
     const lobbyId = location.hash.substr(1);
     if (lobbyId) this.model.setLobbyId(lobbyId);
   }
