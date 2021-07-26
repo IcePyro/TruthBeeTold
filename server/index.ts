@@ -22,11 +22,11 @@ const sessions: { [key: string]: Session } = {};  // TODO this should also be a 
 io.on("connection", (socket) => {
     constructSession(socket);
     //createOrJoin(socket);
-    if(activeUsers[socket.data.id].roomID){
-        socket.join(activeUsers[socket.data.id].roomID);
-        console.log("rejoining user" + socket.data.id + " to room " + activeUsers[socket.data.id].roomID)
+    if(activeUsers[socket.data.id].room){
+        socket.join(activeUsers[socket.data.id].room.id);
+        console.log("rejoining user" + socket.data.id + " to room " + activeUsers[socket.data.id].room.id)
     }
-    updateUserState(io, activeUsers, socket.data.id, activeUsers[socket.data.id].roomID)
+    updateUserState(io, activeUsers, activeUsers[socket.data.id])
 
     socket.on("disconnect", () => {
         console.log(`Socket ${socket.data.id} disconnected`);

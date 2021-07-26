@@ -1,3 +1,3 @@
-exports.init = function (io, activeUsers, userID, roomID){
+exports.init = function (io, userID){
 
 }

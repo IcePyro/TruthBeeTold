@@ -1,4 +1,5 @@
 import {Socket} from 'socket.io';
+import Room from "./Room";
 
 export class User {
     constructor(socket) {
@@ -10,7 +11,7 @@ export class User {
     socket?: Socket;
     username?: string = generateUsername();
     state?: number;
-    roomID?: string;
+    room?: Room;
 
     public get id(): number | undefined {
         return this.socket?.data?.id;
