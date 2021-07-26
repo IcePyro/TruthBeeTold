@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
         socket.join(activeUsers[socket.data.id].room.id);
         console.log("rejoining user" + socket.data.id + " to room " + activeUsers[socket.data.id].room.id)
     }
-    updateUserState(io, activeUsers, activeUsers[socket.data.id])
+    updateUserState(io,activeUsers[socket.data.id])
 
     socket.on("disconnect", () => {
         console.log(`Socket ${socket.data.id} disconnected`);
@@ -52,14 +52,15 @@ function constructSession(socket: Socket) {
         console.log(`Reconstructed session for user ${session.userid}`);
     } else {  // If no session is present create a new one
         const newToken = crypto.randomBytes(16).toString('base64');
-        const newUser = new User(socket);
         const newUserId = getNextUserId();
+        socket.data.id = newUserId;
+        const newUser = new User(socket);
         const newSession: Session = {constructed: Date.now(), userid: newUserId};
         activeUsers[newUserId] = newUser;
         sessions[newToken] = newSession;
-        socket.data.id = newUserId;
+
         socket.emit('construct-session', {token: newToken, userId: newUserId});
-        console.log(`Created new user with id ${newUserId}`);
+        console.log(`Created new user with id ${socket.data.id}`);
         activeUsers[socket.data.id].state = StateID.Home;
     }
 }

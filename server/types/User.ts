@@ -4,6 +4,7 @@ import Room from "./Room";
 export class User {
     constructor(socket) {
         this.socket = socket;
+        this.id = socket.data.id;
     }
 
     ready?: boolean;
@@ -12,10 +13,7 @@ export class User {
     username?: string = generateUsername();
     state?: number;
     room?: Room;
-
-    public get id(): number | undefined {
-        return this.socket?.data?.id;
-    }
+    id?: string;
 }
 
 let nextUserId = 0;
