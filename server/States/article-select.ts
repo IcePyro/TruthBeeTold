@@ -26,7 +26,7 @@ function junctionUsers(io, room: Room){
     const bee = room.newBee();
     bee.state = StateID.Bee
 
-    room.usersWithout([queen, bee]).forEach((curr) => {
+    room.usersWithout(queen, bee).forEach((curr) => {
         curr.state = StateID.Wasp;
     })
     updateMultipleUserStates(io, room.users);

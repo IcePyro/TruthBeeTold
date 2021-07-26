@@ -11,7 +11,7 @@ export default function(_1, user: User){
     user.socket.emit('lobbydata', {
         lobbyId: user.room.id,
         username: user.username,
-        users: user.room.usersWithout([user]).map(user => ({userid: user.id, username: user.username, ready: user.ready}))
+        users: user.room.usersWithout(user).map(user => ({userid: user.id, username: user.username, ready: user.ready}))
     });
 
     user.room.emitAllWithout(user, 'userjoin', {userid: user.id, username: user.username});

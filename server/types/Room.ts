@@ -20,7 +20,7 @@ export default class Room {
         return this.sockets.map(s => activeUsers[s.data.id]);
     }
 
-    public usersWithout(without: User[]): User[] {
+    public usersWithout(...without: User[]): User[] {
         return this.users.filter((user) => {
                 return without.find(findUser =>{
                     return user.id === findUser.id;
@@ -55,7 +55,7 @@ export default class Room {
     }
 
     public newBee(): User {
-        const users = this.usersWithout([this.queen]);
+        const users = this.usersWithout(this.queen);
         return users[Math.floor(Math.random() * users.length)];
     }
 
@@ -64,7 +64,7 @@ export default class Room {
     }
 
     public emitAllWithout(user: User, event: string, data: any) {
-        this.usersWithout([user]).forEach(user => user.socket.emit(event, data));
+        this.usersWithout(user).forEach(user => user.socket.emit(event, data));
     }
 
     public updateStates(){

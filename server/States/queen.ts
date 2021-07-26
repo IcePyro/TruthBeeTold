@@ -18,7 +18,7 @@ export default function (io, user: User){
 }
 
 function junctionUsers(io, room: Room){
-    const users = room.usersWithout([room.bee])
+    const users = room.usersWithout(room.bee)
 
     users.forEach((curr) => {
         curr.state = StateID.Wait;
