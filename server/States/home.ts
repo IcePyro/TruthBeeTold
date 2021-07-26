@@ -1,30 +1,31 @@
 import {StateID, updateUserState} from "./state-updater";
+import {activeUsers, User} from "../types/User";
+import Room from "../types/Room";
 
-exports.init = function (io, activeUsers, userID, roomID){
-    activeUsers[userID].socket.once("createlobby", () => {
-        activeUsers[userID].socket.removeAllListeners("joinlobby");
-        activeUsers[userID].state = StateID.Settings
-        updateUserState(io, activeUsers, userID, roomID)
+export default function (io, user: User){
+    user.socket.once("createlobby", () => {
+        user.socket.removeAllListeners("joinlobby");
+        user.state = StateID.Settings
+        updateUserState(io, user)
     })
-    activeUsers[userID].socket.on("joinlobby", (joinRoomID: string) => {
-        activeUsers[userID].socket.removeAllListeners("joinlobby");
-        activeUsers[userID].socket.removeAllListeners("createlobby");
+    user.socket.on("joinlobby", (joinRoomID: string) => {
+        user.socket.removeAllListeners("joinlobby");
+        user.socket.removeAllListeners("createlobby");
 
         if (io.sockets.adapter.rooms.has(joinRoomID)) {
-            activeUsers[userID].socket.removeAllListeners("createlobby");
-            activeUsers[userID].socket.removeAllListeners("joinlobby");
+            user.socket.removeAllListeners("createlobby");
+            user.socket.removeAllListeners("joinlobby");
 
-            activeUsers[userID].socket.rooms.clear();
-            activeUsers[userID].socket.join(joinRoomID);
+            user.socket.rooms.clear();
+            user.socket.join(joinRoomID);
 
 
-            activeUsers[userID].roomID = joinRoomID;
-            activeUsers[userID].socket.emit("joinlobbysuccess", true);
-            activeUsers[userID].socket.state = StateID.Lobby
-            updateUserState(io, activeUsers, userID, joinRoomID)
+            user.room = Room.byId(joinRoomID);
+            user.state = StateID.Lobby
+            updateUserState(io, user)
         } else {
             console.log("requested lobby not found");
-            activeUsers[userID].socket.emit("joinlobbysuccess", false);
+            user.socket.emit("joinlobbysuccess", false);
         }
     })
 }

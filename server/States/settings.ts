@@ -1,18 +1,20 @@
 import {lobbysettings, LobbySettings} from "../index";
 import {StateID, updateUserState} from "./state-updater";
+import {User} from "../types/User";
+import Room from "../types/Room";
 
 let lobbyCounter = 0;
 
-export function init(io, activeUsers, userID, roomID){
-    activeUsers[userID].socket.once("settings", (settings: LobbySettings)=>{
+export default function(io, user: User){
+    user.socket.once("settings", (settings: LobbySettings)=>{
         const lobbyID = generateNextLobbyID();
-        activeUsers[userID].socket.rooms.clear();
-        activeUsers[userID].socket.join(lobbyID);
-        activeUsers[userID].roomID = lobbyID;
+        user.socket.rooms.clear();
+        user.socket.join(lobbyID);
+        user.room = Room.byId(lobbyID);
         lobbysettings[lobbyID] = settings;
 
-        activeUsers[userID].state = StateID.Lobby;
-        updateUserState(io, activeUsers, userID, lobbyID);
+        user.state = StateID.Lobby;
+        updateUserState(io, user);
     })
 }
 function generateNextLobbyID(): string {

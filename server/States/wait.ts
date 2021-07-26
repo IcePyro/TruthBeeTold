@@ -1,3 +1,3 @@
-export function init(io, activeUsers, userID, roomID){
+export default function(io, userID){
     return
 }

@@ -1,39 +1,35 @@
-import {StateID} from "./state-updater";
+import {StateID, updateMultipleUserStates} from "./state-updater";
+import {io} from '../session';
+import Room from '../types/Room';
+import {activeUsers, User} from '../types/User';
 
-const helper = require('../helper-functions')
-const stateNameToID = require("./state-updater").stateNameToID
-const updateUserState = require("./state-updater").updateUserState
-const stateUpdater = require("./state-updater")
 
-exports.init = function (io, activeUsers, userID, roomID){
+export default function (_, user: User){
+    const room = user.room;
+
     const articleSelectListener = (articleID) => {
         if(articleID){
-            activeUsers[userID].articleID = articleID;
-            if(checkAllSocketsArticleLock(io, activeUsers, roomID)){
-                junctionUsers(io, activeUsers, roomID)
+            user.articleID = articleID;
+            if(user.room.allArticleLock){
+                junctionUsers(io, room)
+            } else {
+                room.emitAllWithout(user, 'lockedinarticle', user.id);
             }
         }
     }
-    activeUsers[userID].socket.once('lockinarticle', articleSelectListener)
+    user.socket.once('lockinarticle', articleSelectListener)
 }
 
-function junctionUsers(io, activeUsers, roomID){
-    const queenID = helper.selectRandomQueen(io, roomID).data.id;
-    const beeID = helper.selectRandomBee(io, roomID, queenID).data.id;
+function junctionUsers(io, room: Room){
+    const queen = room.newQueen();
+    queen.state = StateID.Queen;
+    const bee = room.newBee();
+    bee.state = StateID.Bee
 
-    activeUsers[queenID].state = StateID.Queen;
-    activeUsers[beeID].state = StateID.Bee;
-
-    helper.getAllUserIDsInRoom(io, roomID).filter((curr) =>{
-        return !((curr === queenID) || (curr === beeID));
-    }).forEach((curr) => {
-        activeUsers[curr].state = StateID.Wasp;
+    room.usersWithout(queen, bee).forEach((curr) => {
+        curr.state = StateID.Wasp;
     })
-    stateUpdater.updateMultipleUserStates(io, activeUsers, helper.getAllUserIDsInRoom(io, roomID), roomID);
+    updateMultipleUserStates(io, room.users);
 }
 
-function checkAllSocketsArticleLock(io, activeUsers, roomID: string): boolean {
-    return helper.getAllSocketsInRoom(io, roomID).every(curr => {
-        return activeUsers[curr.data.id].articleID !== undefined;
-    });
-}
+

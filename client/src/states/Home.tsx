@@ -3,7 +3,8 @@ import '../styles/home.sass';
 import {user} from '../session/User';
 import {observer} from 'mobx-react';
 import {action, computed, makeAutoObservable, observable} from 'mobx';
-import PageModel, {Page} from './PageModel';
+import {StateComponent} from '../StateModel';
+import {game} from '../game/Game';
 
 class HomeModel {
   constructor() {makeAutoObservable(this);}
@@ -19,16 +20,12 @@ class HomeModel {
   }
 }
 
-export interface HomeProps {
-  page: PageModel;
-}
-
 @observer
-export default class Home extends React.Component<HomeProps> {
+export default class Home extends StateComponent {
   private model = new HomeModel();
 
-  public constructor(props: any) {
-    super(props);
+  public componentDidMount() {
+    game.reset();
 
     const lobbyId = location.hash.substr(1);
     if (lobbyId) this.model.setLobbyId(lobbyId);
@@ -36,20 +33,18 @@ export default class Home extends React.Component<HomeProps> {
 
   private onCreateLobby() {
     user.socket.emit('createlobby');
-    this.props.page.onNextPage(Page.Settings);
   }
 
   private onJoinLobby() {
     if (this.model.hasLobbyId) {
       user.socket.emit('joinlobby', this.model.lobbyId);
-      this.props.page.onNextPage(Page.Lobby);
     } else {
       alert('no lobby');
     }
   }
 
   render(): React.ReactNode {
-    return (<div style={this.props.page.enabledStyle}>
+    return (<div style={this.props.stateModel.enabledStyle}>
       <h1>Home</h1>
       <input autoComplete='off' id='lobbyid' defaultValue={this.model.lobbyId} onChange={e => this.model.setLobbyId(e.target.value)}/>
       <button onClick={() => this.onJoinLobby()}>Join Lobby</button>

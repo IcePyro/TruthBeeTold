@@ -9,21 +9,17 @@ interface UserData {
   username?: string;
 }
 
+/**
+ * Stores session information.
+ * For temporary game data use {@link OwnUser}
+ */
 export default class User {
-  private static _instance?: User;
-
-  public static get instance(): User {
-    if (!this._instance) {
-      this._instance = new User();
-    }
-    return this._instance;
-  }
-
   private _socket?: Socket;
   @observable id?: number;
-  @observable ready?: boolean;
-  @observable articleID?: string;
   @observable username?: string;
+
+  /** Need this, because we cannot include game */
+  public reconstructionCallback: (ready?: boolean, articleId?: string) => void = () => {return;};
 
   constructor() {makeAutoObservable(this);}
 
@@ -60,8 +56,7 @@ export default class User {
       runInAction(() => {
         this.id = user.id;
         this.username = user.username;
-        this.articleID = user.articleID;
-        this.ready = user.ready;
+        this.reconstructionCallback(user.ready, user.articleID);
       });
       console.log(`Reconstructed new user with id ${user.id}`);
     });
@@ -70,7 +65,4 @@ export default class User {
   }
 }
 
-/**
- * Shortcut for getting the user
- */
-export const user = User.instance;
+export const user = new User();
