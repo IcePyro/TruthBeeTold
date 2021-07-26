@@ -1,3 +1,3 @@
-exports.init = function (io, userID){
+export default function (io, userID){
 
 }

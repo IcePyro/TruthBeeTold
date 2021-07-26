@@ -5,7 +5,7 @@ import Room from "../types/Room";
 
 let lobbyCounter = 0;
 
-export function init(io, user: User){
+export default function(io, user: User){
     user.socket.once("settings", (settings: LobbySettings)=>{
         const lobbyID = generateNextLobbyID();
         user.socket.rooms.clear();

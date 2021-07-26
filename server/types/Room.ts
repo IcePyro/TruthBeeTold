@@ -24,7 +24,7 @@ export default class Room {
         return this.users.filter((user) => {
                 return without.find(findUser =>{
                     return user.id === findUser.id;
-                }) !== undefined;
+                }) === undefined;
             });
     }
 
@@ -49,12 +49,12 @@ export default class Room {
     }
 
 
-    public get newQueen(): User {
+    public newQueen(): User {
         const users = this.users;
         return users[Math.floor(Math.random() * users.length)];
     }
 
-    public get newBee(): User {
+    public newBee(): User {
         const users = this.usersWithout([this.queen]);
         return users[Math.floor(Math.random() * users.length)];
     }

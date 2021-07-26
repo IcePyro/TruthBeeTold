@@ -4,7 +4,7 @@ import Room from '../types/Room';
 import {activeUsers, User} from '../types/User';
 
 
-exports.init = function (_, user: User){
+export default function (_, user: User){
     const room = user.room;
 
     const articleSelectListener = (articleID) => {
@@ -21,11 +21,10 @@ exports.init = function (_, user: User){
 }
 
 function junctionUsers(io, room: Room){
-    const queen = room.newQueen;
-    const bee = room.newBee;
-
+    const queen = room.newQueen();
     queen.state = StateID.Queen;
-    bee.state = StateID.Bee;
+    const bee = room.newBee();
+    bee.state = StateID.Bee
 
     room.usersWithout([queen, bee]).forEach((curr) => {
         curr.state = StateID.Wasp;

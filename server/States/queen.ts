@@ -5,7 +5,7 @@ import {Server} from 'socket.io';
 import {activeUsers, User} from '../types/User';
 import Room from '../types/Room';
 
-exports.init = function (io, user: User){
+export default function (io, user: User){
     io.to(user.room.id).emit('selectedarticle', user.room.bee.articleID);
     const beeSelectListener = (selectedId: number) =>{
         const correct = activeUsers[selectedId].state === StateID.Bee;

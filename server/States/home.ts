@@ -2,7 +2,7 @@ import {StateID, updateUserState} from "./state-updater";
 import {activeUsers, User} from "../types/User";
 import Room from "../types/Room";
 
-exports.init = function (io, user: User){
+export default function (io, user: User){
     user.socket.once("createlobby", () => {
         user.socket.removeAllListeners("joinlobby");
         user.state = StateID.Settings

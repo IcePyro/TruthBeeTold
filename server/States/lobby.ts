@@ -3,7 +3,7 @@ import room from '../types/room';
 import {activeUsers, User} from '../types/User';
 import {io} from '../session';
 
-export function init(_1, user: User){
+export default function(_1, user: User){
     user.ready = false;
     console.log("socket joined lobby: " + user.room.id);
 

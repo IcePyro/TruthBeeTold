@@ -1,3 +1,3 @@
-export function init(io, userID){
+export default function(io, userID){
     return
 }
