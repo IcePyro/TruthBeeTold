@@ -3,15 +3,15 @@ import {action, computed, makeAutoObservable, observable} from 'mobx';
 export enum Page { Home, Settings, Lobby, Game, ArticleSelect, BeeAndWasp, Queen, Wait}
 
 export const PageCalls: {[key: number]: number} = {
-  10: Page.Home,
-  14: Page.Settings,
-  12: Page.Lobby,
-  101: Page.Game,
-  0: Page.ArticleSelect,
-  2: Page.BeeAndWasp,
-  3: Page.BeeAndWasp,
-  1: Page.Queen,
-  4: Page.Wait,
+  0: Page.Home,
+  1: Page.Settings,
+  2: Page.Lobby,
+  100: Page.Game,
+  3: Page.ArticleSelect,
+  4: Page.BeeAndWasp,
+  5: Page.BeeAndWasp,
+  6: Page.Queen,
+  7: Page.Wait,
 };
 
 export default class PageModel {
