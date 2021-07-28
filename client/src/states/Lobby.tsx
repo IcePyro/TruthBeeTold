@@ -8,6 +8,7 @@ import { debounce, without } from 'lodash';
 import ClipboardJS from 'clipboard';
 import OtherUserView from '../components/OtherUserView';
 import {game} from '../game/Game';
+import {findMe} from '../game/CommonUser';
 
 class LobbyModel {
   constructor() { makeAutoObservable(this); }
@@ -29,7 +30,7 @@ export default class Lobby extends StateComponent {
     new ClipboardJS('#copylobbyid', {text: () => this.lobbyUrl});
 
     user.socket.on('lobbydata', ({lobbyId, users}: {lobbyId: string, users: Array<{userid: number, username: string, ready: boolean}>}) => {
-      const me = users.find(user => game.ownUser.id === user.userid);
+      const me = findMe(users);
       if (!me) return console.error('Could not find own user in lobby data');
       const others = without(users, me).map(other => new OtherUser(other.userid, other.username, other.ready));
 

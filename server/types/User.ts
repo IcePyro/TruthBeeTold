@@ -13,7 +13,7 @@ export class User {
     username?: string = generateUsername();
     state?: number;
     room?: Room;
-    id?: string;
+    id?: number;
 }
 
 let nextUserId = 0;

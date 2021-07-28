@@ -1,4 +1,4 @@
-import {action, makeAutoObservable, observable} from 'mobx';
+import {action, computed, makeAutoObservable, observable} from 'mobx';
 import {user} from '../session/User';
 import {CommonUser} from './CommonUser';
 
@@ -35,5 +35,9 @@ export default class OwnUser implements CommonUser {
   @action reconstruct(ready: boolean | undefined, articleId: string | undefined) {
     this.ready = ready || false;
     this.articleId = articleId;
+  }
+
+  @computed hasArticle(): boolean {
+    return this.articleId !== undefined;
   }
 }

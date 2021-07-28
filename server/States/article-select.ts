@@ -7,17 +7,22 @@ import {activeUsers, User} from '../types/User';
 export default function (_, user: User){
     const room = user.room;
 
+    user.socket.emit('lockedstatus', getLockedArticleData(room));
     const articleSelectListener = (articleID) => {
         if(articleID){
             user.articleID = articleID;
             if(user.room.allArticleLock){
                 junctionUsers(io, room)
             } else {
-                room.emitAllWithout(user, 'lockedinarticle', user.id);
+                user.room.emitAll('lockedstatus', getLockedArticleData(room));
             }
         }
     }
     user.socket.once('lockinarticle', articleSelectListener)
+}
+
+function getLockedArticleData(room: Room): Array<{userid: number, hasArticle: boolean}> {
+    return room.users.map(user => ({userid: user.id, hasArticle: user.articleID !== undefined}));
 }
 
 function junctionUsers(io, room: Room){
