@@ -4,7 +4,7 @@ import React, {ChangeEvent} from 'react';
 import {user} from '../session/User';
 import {StateComponent} from '../StateModel';
 import OtherUser from '../game/OtherUser';
-import { debounce } from 'lodash';
+import { debounce, without } from 'lodash';
 import ClipboardJS from 'clipboard';
 import OtherUserView from '../components/OtherUserView';
 import {game} from '../game/Game';
@@ -26,17 +26,16 @@ export default class Lobby extends StateComponent {
   private model = new LobbyModel();
 
   public componentDidMount() {
-    new ClipboardJS('#lobbyid', {text: () => this.lobbyUrl});
+    new ClipboardJS('#copylobbyid', {text: () => this.lobbyUrl});
 
-    user.socket.on('lobbydata', (data: {lobbyId: string, username: string, users: Array<{userid: number, username: string, ready: boolean}>}) => {
-      user.setUsername(data.username);
-      const users = data.users.map(user => new OtherUser(user.userid, user.username, user.ready));
-      game.otherUsers.setUsers(users);
-      this.model.setLobbyId(data.lobbyId);
-    });
+    user.socket.on('lobbydata', ({lobbyId, users}: {lobbyId: string, users: Array<{userid: number, username: string, ready: boolean}>}) => {
+      const me = users.find(user => game.ownUser.id === user.userid);
+      if (!me) return console.error('Could not find own user in lobby data');
+      const others = without(users, me).map(other => new OtherUser(other.userid, other.username, other.ready));
 
-    user.socket.on('userjoin', (user: { userid: number, username: string }) => {
-      game.otherUsers.addUser(new OtherUser(user.userid, user.username));
+      this.model.setLobbyId(lobbyId);
+      user.setUsername(me.username);
+      game.otherUsers.setUsers(others);
     });
 
     user.socket.on('changedusername', ({userid, username}: {userid: number, username: string}) => {
@@ -84,7 +83,7 @@ export default class Lobby extends StateComponent {
     return (<div style={this.props.stateModel.enabledStyle}>
       <h1>Lobby</h1>
       <h2>Your Lobby:</h2>
-      <a id='lobbyid'>{this.lobbyUrl}</a>
+      <a id='copylobbyid'>{this.lobbyUrl}</a>
       <h2>Your username:</h2>
       <input defaultValue={user.username} onChange={e => this.onUsernameChange(e)}/>
       <input type='checkbox' onChange={(e) => this.onToggleReady(e)}/>

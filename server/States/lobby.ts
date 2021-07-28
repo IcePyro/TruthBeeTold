@@ -8,13 +8,10 @@ export default function(_1, user: User){
     console.log("socket joined lobby: " + user.room.id);
 
 
-    user.socket.emit('lobbydata', {
+    user.room.emitAll('lobbydata', {
         lobbyId: user.room.id,
-        username: user.username,
-        users: user.room.usersWithout(user).map(user => ({userid: user.id, username: user.username, ready: user.ready}))
+        users: user.room.users.map(user => ({userid: user.id, username: user.username, ready: user.ready}))
     });
-
-    user.room.emitAllWithout(user, 'userjoin', {userid: user.id, username: user.username});
 
     user.socket.on('setusername', (username: string) => {
         user.username = username;
