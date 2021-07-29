@@ -7,9 +7,26 @@ import {game} from '../game/Game';
 import {UsersHaveArticleView} from '../components/UsersHaveArticleView';
 import {findMe} from '../game/CommonUser';
 import {without} from 'lodash';
+import {wiki, WikiOptions} from '../../../wiki';
+import {action, makeAutoObservable, observable} from 'mobx';
+
+const wikiOptions: WikiOptions = {
+  domain: 'wikipedia.org',
+  lang: 'en',
+  ns: 0
+};
+
+class ArticleSelectModel {
+  constructor() { makeAutoObservable(this); }
+
+  @observable articleHtml = '<div></div>';
+  @action setArticleHtml(html: string) { this.articleHtml = html; }
+}
 
 @observer
 export default class ArticleSelect extends StateComponent {
+  private model = new ArticleSelectModel();
+
   public componentDidMount() {
     user.socket.on('lockedstatus', (users: Array<{userid: number, hasArticle: boolean}>) => {
       const me = findMe(users);
@@ -35,13 +52,23 @@ export default class ArticleSelect extends StateComponent {
     }
   }
 
+  private async randomArticle() {
+    const w = wiki(wikiOptions);
+    const page = await w.randomPage();
+    (document.getElementById('article-select') as HTMLInputElement).value = page.title;
+    const html = await w.pageHTML(page.id);
+    this.model.setArticleHtml(html);
+  }
+
   render() {
     return (<div style={this.props.stateModel.enabledStyle}>
       <LastWinView />
       <h1>Select Article</h1>
       <input type='text' id='article-select'/>
       <button onClick={() => this.selectArticle()}>Submit</button>
+      <button onClick={() => this.randomArticle()}>Random Article</button>
       <UsersHaveArticleView />
+      <div dangerouslySetInnerHTML={{__html: this.model.articleHtml}}/>
     </div>);
   }
 }

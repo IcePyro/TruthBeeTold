@@ -7,7 +7,10 @@ import {activeUsers, User} from '../types/User';
 export default function (_, user: User){
     const room = user.room;
 
-    user.socket.emit('lockedstatus', getLockedArticleData(room));
+    user.socket.emit('lockedstatusown', {
+        status: getLockedArticleData(room)
+    });
+
     const articleSelectListener = (articleID) => {
         if(articleID){
             user.articleID = articleID;
