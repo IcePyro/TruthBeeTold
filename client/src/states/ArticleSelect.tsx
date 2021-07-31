@@ -10,9 +10,11 @@ import {without} from 'lodash';
 import {wiki, WikiOptions} from '../../../wiki';
 import {action, makeAutoObservable, observable} from 'mobx';
 
+import '../styles/wiki.sass';
+
 const wikiOptions: WikiOptions = {
   domain: 'wikipedia.org',
-  lang: 'en',
+  lang: 'de',
   ns: 0
 };
 
