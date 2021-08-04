@@ -1,6 +1,5 @@
 import {StateID, updateUserState} from "./state-updater";
-import room from '../types/room';
-import {activeUsers, User} from '../types/User';
+import {User} from '../types/User';
 import {io} from '../session';
 
 export default function(_1, user: User){
