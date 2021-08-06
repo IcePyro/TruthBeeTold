@@ -15,9 +15,7 @@ class ArticleViewModel {
 export default class ArticleView extends React.Component {
   private model = new ArticleViewModel();
 
-  constructor(props: any) {
-    super(props);
-
+  componentDidMount() {
     user.socket.on('selectedarticle', (article: string) => {
       this.model.setArticle(article);
     });

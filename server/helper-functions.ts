@@ -1,7 +1,6 @@
-import {Socket} from "socket.io";
+import {Server, Socket} from "socket.io";
 
-
-
+// TODO remove, use Room.sockets
 export const getAllSocketsInRoom = (io, roomID: string): Socket[] => {
     //Do not use this as a variable or to assign it to something, this is a temporary freezeframe.
     //if the sockets in the room change, the function return does not
@@ -9,7 +8,9 @@ export const getAllSocketsInRoom = (io, roomID: string): Socket[] => {
         return io.sockets.sockets.get(socketID);
     });
 }
-export const getAllUserIDsInRoom = (io, roomID) => {
+
+// TODO remove use Room.users
+export const getAllUserIDsInRoom = (io, roomID): number[] => {
     return exports.getAllSocketsInRoom(io, roomID).map((curr) => curr.data.id)
 }
 exports.selectRandomQueen = function (io, roomID) {
