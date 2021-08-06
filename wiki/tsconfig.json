@@ -2,6 +2,10 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES6",
-    "moduleResolution": "Node"
-  }
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "declaration": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "test", "dist"]
 }

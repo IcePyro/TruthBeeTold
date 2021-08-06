@@ -2,8 +2,11 @@
   "name": "wiki",
   "version": "1.0.0",
   "description": "Access the wikipedia through their API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
     "test": "npx mocha -r ts-node/register 'test.ts'"
   },
   "repository": {

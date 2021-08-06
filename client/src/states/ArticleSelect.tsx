@@ -7,7 +7,7 @@ import {game} from '../game/Game';
 import {UsersHaveArticleView} from '../components/UsersHaveArticleView';
 import {findMe} from '../game/CommonUser';
 import {without} from 'lodash';
-import {wiki, WikiOptions} from '../../../wiki';
+import {wiki, WikiOptions} from 'wiki';
 import {action, makeAutoObservable, observable} from 'mobx';
 
 import '../styles/wiki.sass';

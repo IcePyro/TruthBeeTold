@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import {wiki, WikiOptions} from './index';
+import {wiki, WikiOptions} from '../src';
 
 const defaultOptions: WikiOptions = {domain: 'wikipedia.org', lang: 'de', ns: 0};
 
