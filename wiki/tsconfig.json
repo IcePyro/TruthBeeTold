@@ -4,7 +4,8 @@
     "target": "ES6",
     "moduleResolution": "Node",
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+    "lib": ["ES2020"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "test", "dist"]
