@@ -7,16 +7,15 @@ import {game} from '../game/Game';
 import {UsersHaveArticleView} from '../components/UsersHaveArticleView';
 import {findMe} from '../game/CommonUser';
 import {without} from 'lodash';
-import {wiki, WikiOptions} from 'wiki';
 import {action, makeAutoObservable, observable} from 'mobx';
 
 import '../styles/wiki.sass';
 
-const wikiOptions: WikiOptions = {
-  domain: 'wikipedia.org',
-  lang: 'de',
-  ns: 0
-};
+// const wikiOptions: WikiOptions = {
+//   domain: 'wikipedia.org',
+//   lang: 'de',
+//   ns: 0
+// };
 
 class ArticleSelectModel {
   constructor() { makeAutoObservable(this); }
@@ -55,11 +54,11 @@ export default class ArticleSelect extends StateComponent {
   }
 
   private async randomArticle() {
-    const w = wiki(wikiOptions);
-    const page = await w.randomPage();
-    (document.getElementById('article-select') as HTMLInputElement).value = page.title;
-    const html = await w.pageHTML(page.id);
-    this.model.setArticleHtml(html);
+    // const w = wiki(wikiOptions);
+    // const page = await w.randomPage();
+    // (document.getElementById('article-select') as HTMLInputElement).value = page.title;
+    // const html = await w.pageHTML(page.id);
+    // this.model.setArticleHtml(html);
   }
 
   render() {
