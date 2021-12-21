@@ -1,5 +1,4 @@
 import {StateID, updateUserState} from "./state-updater";
-import room from '../types/room';
 import {activeUsers, User} from '../types/User';
 import {io} from '../session';
 
