@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - run: cmod cd server/
     - uses: actions/checkout@v2
     - name: Docker Build & Push Action
       uses: mr-smithers-excellent/docker-build-push@v5.6
       with:
         image: icepyromaniac/truthbeetold
         registry: docker.io
-        dockerfile: ./server
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
