@@ -17,6 +17,6 @@ jobs:
       with:
         image: icepyromaniac/truthbeetold
         registry: docker.io
-        directory: ./server
+        dockerfile: ./server
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
