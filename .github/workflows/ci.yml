@@ -12,12 +12,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build the Docker image
+    - name: Docker Build & Push Action
       uses: mr-smithers-excellent/docker-build-push@v5.6
       with:
         image: icepyromaniac/truthbeetold
         registry: docker.io
-        dockerfile: ./server/
-        directory: ./server/
+        dockerfile: ./server
+        directory: ./server
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
