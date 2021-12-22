@@ -1,0 +1,12 @@
+
+.menu {
+  a {
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      color: #ffcd39;
+    }
+  }
+}
