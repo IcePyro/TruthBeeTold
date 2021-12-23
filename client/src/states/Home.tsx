@@ -48,7 +48,7 @@ export default class Home extends StateComponent {
   }
 
   render(): React.ReactNode {
-    return (<Page>
+    return (
       <div style={this.props.stateModel.enabledStyle}>
         <h1>Home</h1>
         <FormControl id="lobbyid" defaultValue={this.model.lobbyId}
@@ -56,6 +56,6 @@ export default class Home extends StateComponent {
         <Button onClick={() => this.onJoinLobby()}>Join Lobby</Button>
         <Button onClick={() => this.onCreateLobby()}>Create Lobby</Button>
       </div>
-    </Page>);
+    );
   }
 }
