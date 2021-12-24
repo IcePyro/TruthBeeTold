@@ -10,10 +10,6 @@ export default class StateModel {
   @action setEnabled(enabled: boolean) {
     this.enabled = enabled;
   }
-
-  @computed get enabledStyle() {
-    return {display: this.enabled ? 'block' : 'none'};
-  }
 }
 
 export interface StateComponentProps {

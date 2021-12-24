@@ -7,6 +7,7 @@ import {StateComponent} from '../StateModel';
 import {game} from '../game/Game';
 import {Page} from '../components/Page';
 import {Button, FormControl, InputGroup} from 'react-bootstrap';
+import {TitledHGap} from '../components/TitledHGap';
 
 class HomeModel {
   constructor() {
@@ -49,13 +50,20 @@ export default class Home extends StateComponent {
 
   render(): React.ReactNode {
     return (
-      <div style={this.props.stateModel.enabledStyle}>
+      <Page enabled={this.props.stateModel.enabled} startOfPage={
         <h1>Home</h1>
-        <FormControl id="lobbyid" defaultValue={this.model.lobbyId}
-                     onChange={e => this.model.setLobbyId(e.target.value)}/>
-        <Button onClick={() => this.onJoinLobby()}>Join Lobby</Button>
-        <Button onClick={() => this.onCreateLobby()}>Create Lobby</Button>
-      </div>
+      } endOfPage={
+        <>
+          <InputGroup>
+            <FormControl id="lobbyid" defaultValue={this.model.lobbyId}
+                         onChange={e => this.model.setLobbyId(e.target.value)}/>
+            <Button onClick={() => this.onJoinLobby()}>Join Lobby</Button>
+          </InputGroup>
+          <TitledHGap>or</TitledHGap>
+          <Button onClick={() => this.onCreateLobby()}>Create Lobby</Button>
+        </>
+      }
+      />
     );
   }
 }

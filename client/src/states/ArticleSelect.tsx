@@ -11,6 +11,7 @@ import {wiki, WikiOptions} from '../../../wiki';
 import {action, makeAutoObservable, observable} from 'mobx';
 
 import '../styles/wiki.sass';
+import {Page} from '../components/Page';
 
 const wikiOptions: WikiOptions = {
   domain: 'wikipedia.org',
@@ -63,14 +64,21 @@ export default class ArticleSelect extends StateComponent {
   }
 
   render() {
-    return (<div style={this.props.stateModel.enabledStyle}>
-      <LastWinView />
-      <h1>Select Article</h1>
-      <input type='text' id='article-select'/>
-      <button onClick={() => this.selectArticle()}>Submit</button>
-      <button onClick={() => this.randomArticle()}>Random Article</button>
-      <UsersHaveArticleView />
-      <div dangerouslySetInnerHTML={{__html: this.model.articleHtml}}/>
-    </div>);
+    return (<Page enabled={this.props.stateModel.enabled}
+      startOfPage={
+        <>
+          <LastWinView />
+          <h1>Select Article</h1>
+          <input type='text' id='article-select'/>
+          <button onClick={() => this.selectArticle()}>Submit</button>
+          <button onClick={() => this.randomArticle()}>Random Article</button>
+          <UsersHaveArticleView />
+          <div dangerouslySetInnerHTML={{__html: this.model.articleHtml}}/>
+        </>
+      }
+      endOfPage={
+        <>
+        </>
+      } />);
   }
 }

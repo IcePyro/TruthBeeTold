@@ -4,6 +4,7 @@ import {user} from '../session/User';
 import ArticleView from '../components/ArticleView';
 import {StateComponent} from '../StateModel';
 import {game} from '../game/Game';
+import {Page} from '../components/Page';
 
 @observer
 export default class Queen extends StateComponent {
@@ -23,11 +24,18 @@ export default class Queen extends StateComponent {
         <input type='radio' className='player-selection' name='players' value={user.id}/>
       </div>
     ));
-    return (<div style={this.props.stateModel.enabledStyle}>
-      <h1>Yas Queen</h1>
-      <ArticleView />
-      {players}
-      <button onClick={() => this.selectPlayer()}>Submit</button>
-    </div>);
+
+    return (<Page enabled={this.props.stateModel.enabled}
+      startOfPage={
+        <>
+          <h1>Yas Queen</h1>
+          <ArticleView />
+          {players}
+        </>
+      } endOfPage={
+        <>
+          <button onClick={() => this.selectPlayer()}>Submit</button>
+        </>
+      } />);
   }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import {observer} from 'mobx-react';
 import {user} from '../session/User';
 import {StateComponent} from '../StateModel';
+import {Page} from '../components/Page';
 
 @observer
 export default class Settings extends StateComponent {
@@ -10,9 +11,15 @@ export default class Settings extends StateComponent {
   }
 
   render(): React.ReactNode {
-    return (<div style={this.props.stateModel.enabledStyle}>
-      <h1>Settings</h1>
-      <button onClick={() => this.onOpenLobby()}>Open Lobby</button>
-    </div>);
+    return (<Page enabled={this.props.stateModel.enabled}
+      startOfPage={
+        <>
+          <h1>Settings</h1>
+        </>
+      } endOfPage={
+        <>
+          <button onClick={() => this.onOpenLobby()}>Open Lobby</button>
+        </>
+      }/>);
   }
 }

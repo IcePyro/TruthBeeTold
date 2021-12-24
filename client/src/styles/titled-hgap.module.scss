@@ -1,0 +1,20 @@
+
+.wrapper {
+  position: relative;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  hr {
+    display: block;
+    margin: 0;
+    width: 50px;
+  }
+
+  span {
+    display: block;
+    margin: 0 20px;
+    transform: translateY(-2px);
+  }
+}
