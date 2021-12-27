@@ -11,6 +11,7 @@ export default function(io, user: User){
         user.socket.rooms.clear();
         user.socket.join(lobbyID);
         user.room = Room.byId(lobbyID);
+        user.room.join(user.id)
         lobbysettings[lobbyID] = settings;
 
         user.state = StateID.Lobby;

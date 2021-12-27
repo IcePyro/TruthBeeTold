@@ -19,8 +19,8 @@ export default function (io, user: User){
             user.socket.rooms.clear();
             user.socket.join(joinRoomID);
 
-
             user.room = Room.byId(joinRoomID);
+            user.room.join(user.id)
             user.state = StateID.Lobby
             updateUserState(io, user)
         } else {
