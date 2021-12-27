@@ -2,12 +2,14 @@ import {Socket} from 'socket.io';
 import {io} from '../session';
 import {activeUsers, User} from './User';
 import {StateID, updateMultipleUserStates} from '../States/state-updater';
+import sha256 = require("crypto-js/sha256");
 
-const activeRooms: { [key: string]: Room } = {};
+const activeRooms: Map<string, Room> = new Map<string, Room>();
+let lobbyCounter = 0;
 
 export default class Room {
     public static byId(id: string): Room {
-        if(activeRooms[id]){
+        if(activeRooms.has(id)){
             return activeRooms[id]
         }else{
             activeRooms[id] = new Room(id);
@@ -90,6 +92,25 @@ export default class Room {
 
     public updateStates(){
         updateMultipleUserStates(io, this.users)
+    }
+
+    /*@returns a hash generated from an internal counter and the current datetime, converted to a base ten number and cut to length 7.
+     * checks for collision with existing rooms, and generates a new id on collision. This will produce a collision about every 3000 hashes*/
+    public static newRoomID(): string{
+        lobbyCounter += 1;
+
+        const hrTime = process.hrtime();
+
+        const hash = sha256(lobbyCounter.toString() + (hrTime[0] * 1000000 + hrTime[1] / 1000).toString()).toString().slice(0,9);
+
+        let id = parseInt(hash, 16).toString().slice(0,7);
+
+        if(activeRooms[id]){
+            id = this.newRoomID()
+        }
+
+        console.log("new lobby id created: " + id);
+        return id;
     }
 }
 
