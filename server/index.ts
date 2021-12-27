@@ -9,7 +9,7 @@ export interface LobbySettings {
     any // TODO specify
 }
 
-interface Session {
+export interface Session {
     userid: number;
     constructed: number;
 }
@@ -17,7 +17,12 @@ interface Session {
 
 export const lobbysettings: { [key: string]: LobbySettings } = {}; //this should probably be a DB later
 
-const sessions: { [key: string]: Session } = {};  // TODO this should also be a DB later
+export const sessions: Map<string, Session> = new Map<string, Session>() // TODO this should also be a DB later
+
+export function terminateSession(token:string){
+    sessions.delete(token);
+
+}
 
 io.on("connection", (socket) => {
     constructSession(socket);
@@ -30,6 +35,9 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log(`Socket ${socket.data.id} disconnected`);
+        if(activeUsers[socket.data.id].room) {
+            activeUsers[socket.data.id].room.notifyDisconnect(socket.data.id)
+        }
     });
 });
 // app.get("/", (req,res) =>{
@@ -42,7 +50,8 @@ io.on("connection", (socket) => {
  */
 function constructSession(socket: Socket) {
     const token = socket.handshake.query?.token as string | undefined;
-    const session = sessions[token];
+    const session = sessions.get(token);
+
 
     if (token && session) {  // If session is present send old session and user data
         socket.data.id = session.userid;
@@ -53,11 +62,15 @@ function constructSession(socket: Socket) {
     } else {  // If no session is present create a new one
         const newToken = crypto.randomBytes(16).toString('base64');
         const newUserId = getNextUserId();
+
         socket.data.id = newUserId;
+
         const newUser = new User(socket);
+        newUser.sessionToken = newToken;
+
         const newSession: Session = {constructed: Date.now(), userid: newUserId};
         activeUsers[newUserId] = newUser;
-        sessions[newToken] = newSession;
+        sessions.set(newToken, newSession)
 
         socket.emit('construct-session', {token: newToken, userId: newUserId});
         console.log(`Created new user with id ${socket.data.id}`);

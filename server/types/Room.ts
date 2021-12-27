@@ -3,23 +3,27 @@ import {io} from '../session';
 import {activeUsers, User} from './User';
 import {StateID, updateMultipleUserStates} from '../States/state-updater';
 import sha256 = require("crypto-js/sha256");
+import {sessions, terminateSession} from "../index";
 
 const activeRooms: Map<string, Room> = new Map<string, Room>();
 let lobbyCounter = 0;
 
 export default class Room {
     public static byId(id: string): Room {
+
         if(activeRooms.has(id)){
-            return activeRooms[id]
+            return activeRooms.get(id)
         }else{
-            activeRooms[id] = new Room(id);
-            return  activeRooms[id]
+            activeRooms.set(id, new Room(id))
+            return  activeRooms.get(id)
         }
     }
 
     private constructor(public id: string) {}
 
     private joinedUsers:number[] = []
+
+    public isIngame = false
 
     public get sockets(): Socket[] {
         return Array.from(io.of("/").adapter.rooms.get(this.id)).map((socketID) => {
@@ -72,6 +76,21 @@ export default class Room {
         this.joinedUsers = this.joinedUsers.filter(u => u !== userID)
     }
 
+    public notifyDisconnect(userID:number){
+        if(this.joinedUsers.every(uID => activeUsers[uID].socket.disconnected === true)){
+            this.joinedUsers.forEach(uID => {
+                terminateSession(activeUsers[uID].sessionToken)
+
+            })
+            activeRooms.delete(this.id)
+        }
+        if(!this.isIngame){
+            this.leave(userID)
+            terminateSession(activeUsers[userID].sessionToken)
+            this.emitLobbyData()
+        }
+    }
+
     public newQueen(): User {
         const users = this.users;
         return users[Math.floor(Math.random() * users.length)];
@@ -83,7 +102,14 @@ export default class Room {
     }
 
     public emitAll(event: string, data: any) {
-        io.to(this.id).emit(event, data);
+        this.users.forEach(user => user.socket.emit(event, data))
+    }
+
+    public emitLobbyData(){
+        this.emitAll('lobbydata', {
+            lobbyId: this.id,
+            users: this.users.map(user => ({userid: user.id, username: user.username, ready: user.ready}))
+        });
     }
 
     public emitAllWithout(user: User, event: string, data: any) {
@@ -105,7 +131,7 @@ export default class Room {
 
         let id = parseInt(hash, 16).toString().slice(0,7);
 
-        if(activeRooms[id]){
+        if(activeRooms.has(id)){
             id = this.newRoomID()
         }
 

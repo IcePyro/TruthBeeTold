@@ -7,6 +7,9 @@ import Room from '../types/Room';
 
 export default function (io, user: User){
     io.to(user.room.id).emit('selectedarticle', user.room.bee.articleID);
+
+    user.room.emitLobbyData()
+
     const beeSelectListener = (selectedId: number) =>{
         const correct = activeUsers[selectedId].state === StateID.Bee;
         const actualBee = user.room.bee;

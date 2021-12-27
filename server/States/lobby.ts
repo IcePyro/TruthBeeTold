@@ -7,10 +7,7 @@ export default function(_1, user: User){
     console.log("socket joined lobby: " + user.room.id);
 
 
-    user.room.emitAll('lobbydata', {
-        lobbyId: user.room.id,
-        users: user.room.users.map(user => ({userid: user.id, username: user.username, ready: user.ready}))
-    });
+    user.room.emitLobbyData()
 
     user.socket.on('setusername', (username: string) => {
         user.username = username;
@@ -24,6 +21,7 @@ export default function(_1, user: User){
         const allReady = user.room.allReady;
         console.log(`All sockets in user.room ${user.room.id} ready: ${allReady}`);
         if (allReady) {
+            user.room.isIngame = true
             user.room.users.forEach((user) =>{
                 user.state = StateID.ArticleSelect
                 updateUserState(io, user)

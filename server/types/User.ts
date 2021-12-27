@@ -14,6 +14,7 @@ export class User {
     state?: number;
     room?: Room;
     id?: number;
+    sessionToken?: string;
 }
 
 let nextUserId = 0;
