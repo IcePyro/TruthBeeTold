@@ -1,10 +1,11 @@
 import {StateID, updateMultipleUserStates} from "./state-updater";
 import {io} from '../session';
 import Room from '../types/Room';
-import {activeUsers, User} from '../types/User';
+import {User} from '../types/User';
+import {Server} from "socket.io";
 
 
-export default function (_, user: User){
+export default function (_: Server, user: User): void{
     const room = user.room;
 
     user.socket.emit('lockedstatusown', {

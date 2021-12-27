@@ -1,11 +1,10 @@
-import {getAllUserIDsInRoom} from "../helper-functions"
 import {updateMultipleUserStates} from "./state-updater";
 import {StateID} from "./state-updater";
 import {Server} from 'socket.io';
 import {activeUsers, User} from '../types/User';
 import Room from '../types/Room';
 
-export default function (io, user: User){
+export default function (io: Server, user: User): void{
     io.to(user.room.id).emit('selectedarticle', user.room.bee.articleID);
 
     user.room.emitLobbyData()

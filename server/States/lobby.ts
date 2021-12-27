@@ -1,8 +1,9 @@
 import {StateID, updateUserState} from "./state-updater";
-import {activeUsers, User} from '../types/User';
+import {User} from '../types/User';
 import {io} from '../session';
+import {Server} from "socket.io";
 
-export default function(_1, user: User){
+export default function(_: Server, user: User):void{
     user.ready = false;
     console.log("socket joined lobby: " + user.room.id);
 

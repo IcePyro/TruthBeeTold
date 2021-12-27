@@ -2,7 +2,7 @@ import {Socket} from 'socket.io';
 import Room from "./Room";
 
 export class User {
-    constructor(socket) {
+    constructor(socket:Socket) {
         this.socket = socket;
         this.id = socket.data.id;
     }

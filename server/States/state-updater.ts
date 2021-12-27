@@ -1,6 +1,5 @@
 //maps state names to state IDs
-import {activeUsers, User} from "../types/User";
-import Room from "../types/Room";
+import {User} from "../types/User";
 import homeInit from "./home"
 import settingsInit from "./settings"
 import lobbyInit from "./lobby"
@@ -9,6 +8,7 @@ import queenInit from "./queen"
 import beeInit from "./bee"
 import waspInit from "./wasp"
 import waitInit from "./wait"
+import {Server} from "socket.io";
 
 
 
@@ -27,12 +27,12 @@ export const stateIDToInitFunction = {
     [StateID.Wait] : waitInit
 }
 // transitions user with userID into state saved in activeUsers by calling the corresponding state init function
-export function updateUserState(io, user: User): void{
+export function updateUserState(io: Server, user: User): void{
     console.log("transitioning user " + user.username + " into state " + StateID[user.state])
     user.socket.emit("statetransition", user.state)
     stateIDToInitFunction[user.state](io, user)
 }
-export function updateMultipleUserStates(io, users: User[]): void{
+export function updateMultipleUserStates(io: Server, users: User[]): void{
     users.forEach((curr) =>{
         updateUserState(io, curr);
     })

@@ -1,9 +1,9 @@
 import {Socket} from 'socket.io';
 import {io} from '../session';
 import {activeUsers, User} from './User';
-import {StateID, updateMultipleUserStates} from '../States/state-updater';
+import {StateID} from '../States/state-updater';
 import sha256 = require("crypto-js/sha256");
-import {sessions, terminateSession} from "../index";
+import {terminateSession} from "../index";
 
 const activeRooms: Map<string, Room> = new Map<string, Room>();
 let lobbyCounter = 0;
@@ -64,7 +64,7 @@ export default class Room {
         return this.users.every(user => user.articleID);
     }
 
-    public join(userID) {
+    public join(userID: number): void {
         if (this.joinedUsers.includes(userID)) {
             return
         } else {
@@ -72,11 +72,11 @@ export default class Room {
         }
     }
 
-    public leave(userID){
+    public leave(userID:number): void{
         this.joinedUsers = this.joinedUsers.filter(u => u !== userID)
     }
 
-    public notifyDisconnect(userID:number){
+    public notifyDisconnect(userID:number): void{
         if(this.joinedUsers.every(uID => activeUsers[uID].socket.disconnected === true)){
             this.joinedUsers.forEach(uID => {
                 terminateSession(activeUsers[uID].sessionToken)
@@ -101,24 +101,21 @@ export default class Room {
         return users[Math.floor(Math.random() * users.length)];
     }
 
-    public emitAll(event: string, data: any) {
+    public emitAll(event: string, data: any) :void{
         this.users.forEach(user => user.socket.emit(event, data))
     }
 
-    public emitLobbyData(){
+    public emitLobbyData():void{
         this.emitAll('lobbydata', {
             lobbyId: this.id,
             users: this.users.map(user => ({userid: user.id, username: user.username, ready: user.ready}))
         });
     }
 
-    public emitAllWithout(user: User, event: string, data: any) {
+    public emitAllWithout(user: User, event: string, data: any):void {
         this.usersWithout(user).forEach(user => user.socket.emit(event, data));
     }
 
-    public updateStates(){
-        updateMultipleUserStates(io, this.users)
-    }
 
     /*@returns a hash generated from an internal counter and the current datetime, converted to a base ten number and cut to length 7.
      * checks for collision with existing rooms, and generates a new id on collision. This will produce a collision about every 3000 hashes*/
