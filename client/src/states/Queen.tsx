@@ -24,7 +24,7 @@ export default class Queen extends StateComponent {
       </div>
     ));
     return (<div style={this.props.stateModel.enabledStyle}>
-      <h1>Yas Queen</h1>
+      <h1>Queen</h1>
       <ArticleView />
       {players}
       <button onClick={() => this.selectPlayer()}>Submit</button>
