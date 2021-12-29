@@ -85,7 +85,7 @@ export default class Room {
     public notifyDisconnect(userID:number): void{
         if(this.joinedUsers.every(uID => activeUsers[uID].socket.disconnected === true)){
             this.joinedUsers.forEach(uID => {
-                terminateSession(activeUsers[uID].sessionToken)
+                activeUsers[uID].reset()
 
             })
             activeRooms.delete(this.id)
@@ -93,7 +93,7 @@ export default class Room {
         }
         if(!this.isIngame){
             this.leave(userID)
-            terminateSession(activeUsers[userID].sessionToken)
+            activeUsers[userID].reset()
             this.emitLobbyData()
         }else{
             //TODO ask lobby host, if he wants to kick or to wait

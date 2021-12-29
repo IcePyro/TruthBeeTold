@@ -20,11 +20,6 @@ export const lobbysettings: { [key: string]: LobbySettings } = {}; //this should
 
 export const sessions: Map<string, Session> = new Map<string, Session>() // TODO this should also be a DB later
 
-export function terminateSession(token:string):void{
-    sessions.delete(token);
-
-}
-
 io.on("connection", (socket) => {
     constructSession(socket);
 

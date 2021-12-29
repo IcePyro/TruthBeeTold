@@ -17,6 +17,16 @@ export class User {
     room?: Room;
     id?: number;
     sessionToken?: string;
+
+    reset(): void{
+        delete this.ready;
+        delete this.articleID;
+        delete this.room;
+
+        this.state = StateID.Home
+
+        logger.logUser('Reset', this);
+    }
 }
 
 let nextUserId = 0;
