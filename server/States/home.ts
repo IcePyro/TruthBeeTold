@@ -2,6 +2,7 @@ import {StateID, updateUserState} from "./state-updater";
 import {User} from "../types/User";
 import Room from "../types/Room";
 import {Server} from "socket.io";
+import logger from "../logger/logger";
 
 export default function (io: Server, user: User): void{
     user.socket.once("createlobby", () => {
@@ -25,7 +26,7 @@ export default function (io: Server, user: User): void{
             user.state = StateID.Lobby
             updateUserState(io, user)
         } else {
-            console.log("requested lobby not found");
+            logger.logUser(`Tried to join an non-existent lobby with id "${joinRoomID}"`, user);
             user.socket.emit("joinlobbysuccess", false);
         }
     })

@@ -4,6 +4,7 @@ import * as http from 'http';
 import * as https from 'https';
 import {Express} from 'express';
 import * as fs from 'fs';
+import logger from './logger/logger';
 
 require("dotenv").config();
 
@@ -32,7 +33,8 @@ function init(): Server {
         }
     });
     server.listen(port);
-    console.log('Server is running, isProduction: ' + isProduction);
+    logger.info(`Server is running on port: ${port}, is production: ${isProduction}`)
+
     return io;
 }
 

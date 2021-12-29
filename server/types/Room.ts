@@ -3,7 +3,7 @@ import {io} from '../session';
 import {activeUsers, User} from './User';
 import {StateID} from '../States/state-updater';
 import sha256 = require("crypto-js/sha256");
-import {terminateSession} from "../index";
+import logger from "../logger/logger";
 
 const activeRooms: Map<string, Room> = new Map<string, Room>();
 let lobbyCounter = 0;
@@ -66,14 +66,20 @@ export default class Room {
 
     public join(userID: number): void {
         if (this.joinedUsers.includes(userID)) {
+            logger.warn({
+                msg: 'Already in Room, should not be able to send join requests',
+                user: activeUsers[userID]
+            })
             return
         } else {
             this.joinedUsers.push(userID)
+            logger.logUser('User joined', activeUsers[userID])
         }
     }
 
     public leave(userID:number): void{
         this.joinedUsers = this.joinedUsers.filter(u => u !== userID)
+        logger.logUser('Left', activeUsers[userID])
     }
 
     public notifyDisconnect(userID:number): void{
@@ -83,11 +89,14 @@ export default class Room {
 
             })
             activeRooms.delete(this.id)
+            logger.logRoom('Room Deleted', this)
         }
         if(!this.isIngame){
             this.leave(userID)
             terminateSession(activeUsers[userID].sessionToken)
             this.emitLobbyData()
+        }else{
+            //TODO ask lobby host, if he wants to kick or to wait
         }
     }
 
@@ -103,6 +112,7 @@ export default class Room {
 
     public emitAll(event: string, data: any) :void{
         this.users.forEach(user => user.socket.emit(event, data))
+        logger.logRoom(`Emitted to all: "${event}"`, this)
     }
 
     public emitLobbyData():void{
@@ -110,10 +120,6 @@ export default class Room {
             lobbyId: this.id,
             users: this.users.map(user => ({userid: user.id, username: user.username, ready: user.ready}))
         });
-    }
-
-    public emitAllWithout(user: User, event: string, data: any):void {
-        this.usersWithout(user).forEach(user => user.socket.emit(event, data));
     }
 
 
@@ -131,8 +137,6 @@ export default class Room {
         if(activeRooms.has(id)){
             id = this.newRoomID()
         }
-
-        console.log("new lobby id created: " + id);
         return id;
     }
 }

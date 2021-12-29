@@ -1,5 +1,7 @@
 import {Socket} from 'socket.io';
 import Room from "./Room";
+import logger from "../logger/logger";
+import {StateID} from "../States/state-updater";
 
 export class User {
     constructor(socket:Socket) {
@@ -24,5 +26,6 @@ export function getNextUserId(): number {
 }
 
 function generateUsername(): string {
-    return 'Random Username 123';
+    return 'Unnamed User';
+    //TODO make this more fun
 }

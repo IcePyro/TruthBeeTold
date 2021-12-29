@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 import {StateID, updateUserState} from "./States/state-updater";
 import {io} from './session';
 import {activeUsers, getNextUserId, User} from './types/User';
+import logger from "./logger/logger";
 
 
 export interface LobbySettings {
@@ -26,15 +27,11 @@ export function terminateSession(token:string):void{
 
 io.on("connection", (socket) => {
     constructSession(socket);
-    //createOrJoin(socket);
-    if(activeUsers[socket.data.id].room){
-        socket.join(activeUsers[socket.data.id].room.id);
-        console.log("rejoining user" + socket.data.id + " to room " + activeUsers[socket.data.id].room.id)
-    }
+
     updateUserState(io,activeUsers[socket.data.id])
 
     socket.on("disconnect", () => {
-        console.log(`Socket ${socket.data.id} disconnected`);
+        logger.logUser(`Socket ${socket.id} disconnected`, activeUsers[socket.data.id]);
         if(activeUsers[socket.data.id].room) {
             activeUsers[socket.data.id].room.notifyDisconnect(socket.data.id)
         }
@@ -58,7 +55,7 @@ function constructSession(socket: Socket) {
         const user = activeUsers[session.userid];
         user.socket = socket;
         socket.emit('reconstruct-session', {user: {id: session.userid, ready: user.ready, articleID: user.articleID, username: user.username}});  // TODO don't reiterate interface
-        console.log(`Reconstructed session for user ${session.userid}`);
+        logger.logUser(`Reconstructed session, new Socket: ${socket.id}`, user);
     } else {  // If no session is present create a new one
         const newToken = crypto.randomBytes(16).toString('base64');
         const newUserId = getNextUserId();
@@ -73,7 +70,7 @@ function constructSession(socket: Socket) {
         sessions.set(newToken, newSession)
 
         socket.emit('construct-session', {token: newToken, userId: newUserId});
-        console.log(`Created new user with id ${socket.data.id}`);
+        logger.logUser('Created', newUser);
         activeUsers[socket.data.id].state = StateID.Home;
     }
 }

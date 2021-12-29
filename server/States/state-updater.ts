@@ -9,6 +9,7 @@ import beeInit from "./bee"
 import waspInit from "./wasp"
 import waitInit from "./wait"
 import {Server} from "socket.io";
+import logger from "../logger/logger";
 
 
 
@@ -28,7 +29,7 @@ export const stateIDToInitFunction = {
 }
 // transitions user with userID into state saved in activeUsers by calling the corresponding state init function
 export function updateUserState(io: Server, user: User): void{
-    console.log("transitioning user " + user.username + " into state " + StateID[user.state])
+    logger.logUser(`Transitioning to State "${StateID[user.state]}"`, user)
     user.socket.emit("statetransition", user.state)
     stateIDToInitFunction[user.state](io, user)
 }

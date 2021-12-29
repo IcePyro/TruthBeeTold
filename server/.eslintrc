@@ -8,6 +8,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "eqeqeq": ["error", "always"]
+    "eqeqeq": ["error", "always"],
+    "no-console": "warn"
   }
 }

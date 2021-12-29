@@ -3,6 +3,7 @@ import {StateID} from "./state-updater";
 import {Server} from 'socket.io';
 import {activeUsers, User} from '../types/User';
 import Room from '../types/Room';
+import logger from "../logger/logger";
 
 export default function (io: Server, user: User): void{
     io.to(user.room.id).emit('selectedarticle', user.room.bee.articleID);
@@ -12,8 +13,8 @@ export default function (io: Server, user: User): void{
     const beeSelectListener = (selectedId: number) =>{
         const correct = activeUsers[selectedId].state === StateID.Bee;
         const actualBee = user.room.bee;
-        console.log(`Bee selected. Correct: ${correct}. Selected: ${selectedId}. Actual Bee: ${actualBee.id}`)
-        io.to(user.room.id).emit("beeselected", {queen: user.id, selected: selectedId, bee: actualBee.id, correct});
+        logger.logUser(`Bee selected. Correct: ${correct}. Selected: ${selectedId}. Actual Bee: ${actualBee.id}`, user)
+        user.room.emitAll("beeselected", {queen: user.id, selected: selectedId, bee: actualBee.id, correct});
         junctionUsers(io, user.room)
     }
     user.socket.once("beeselect", beeSelectListener)
