@@ -2,8 +2,8 @@ import {Socket} from 'socket.io';
 import {io} from '../session';
 import {activeUsers, User} from './User';
 import {StateID} from '../States/state-updater';
-import sha256 = require("crypto-js/sha256");
 import logger from "../logger/logger";
+import sha256 = require("crypto-js/sha256");
 
 const activeRooms: Map<string, Room> = new Map<string, Room>();
 let lobbyCounter = 0;
@@ -64,6 +64,7 @@ export default class Room {
         return this.users.every(user => user.articleID);
     }
 
+    //TODO refactor userID to user
     public join(userID: number): void {
         if (this.joinedUsers.includes(userID)) {
             logger.warn({
