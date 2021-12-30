@@ -21,7 +21,6 @@ function createServerProduction(app: Express) {
 const isProduction = process.env.NODE_ENV === 'production';
 
 function init(): Server {
-    getCertOptions()
     const port = parseInt(process.env.PORT || '3000');
     const app = express();
     const server = isProduction ? createServerProduction(app) : createServerDevelop(app);
@@ -41,13 +40,12 @@ export const io = init();
 function getCertOptions() {
 
     try{
-        console.log('Grabbing cert and key')
-        console.log(fs.readdirSync('/cert/'))
+        logger.info('Grabbing cert and key')
         const cert = fs.readdirSync('/cert/').filter(
             value => value.startsWith('fullchain')).sort().pop()
         const key = fs.readdirSync('/cert/').filter(
             value => value.startsWith('privkey')).sort().pop()
-        console.log(`grabbed cert: ${cert} and key: ${key}`)
+        logger.info(`grabbed cert: ${cert} and key: ${key}`)
         return {
             key:fs.readFileSync('/cert/' + key),
             cert:fs.readFileSync('/cert/' + cert)
