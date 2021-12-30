@@ -6,7 +6,7 @@ import {Server} from "socket.io";
 import logger from "../logger/logger";
 
 
-export default function (_: Server, user: User): void{
+export default function (_: Server, user: User): void {
     const room = user.room;
 
     user.socket.emit('lockedstatusown', {
@@ -14,11 +14,11 @@ export default function (_: Server, user: User): void{
     });
 
     const articleSelectListener = (articleID) => {
-        if(articleID){
+        if (articleID) {
             articleID = articleID.toString()
             user.articleID = articleID;
             logger.logUser(`Selected article: ${articleID}`)
-            if(user.room.allArticleLock){
+            if (user.room.allArticleLock) {
                 junctionUsers(io, room)
             } else {
                 user.room.emitAll('lockedstatus', getLockedArticleData(room));
@@ -28,11 +28,11 @@ export default function (_: Server, user: User): void{
     user.socket.once('lockinarticle', articleSelectListener)
 }
 
-function getLockedArticleData(room: Room): Array<{userid: number, hasArticle: boolean}> {
+function getLockedArticleData(room: Room): Array<{ userid: number, hasArticle: boolean }> {
     return room.users.map(user => ({userid: user.id, hasArticle: user.articleID !== undefined}));
 }
 
-function junctionUsers(io, room: Room){
+function junctionUsers(io, room: Room) {
     logger.logRoom('All articles selected, junctioning', room)
     const queen = room.newQueen();
     queen.state = StateID.Queen;

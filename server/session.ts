@@ -1,8 +1,8 @@
 import {Server} from 'socket.io';
 import * as express from 'express';
+import {Express} from 'express';
 import * as http from 'http';
 import * as https from 'https';
-import {Express} from 'express';
 import * as fs from 'fs';
 import logger from './logger/logger';
 
@@ -39,18 +39,18 @@ export const io = init();
 
 function getCertOptions() {
 
-    try{
+    try {
         logger.info('Grabbing cert and key')
         const cert = fs.readdirSync('./').filter(
             value => value.startsWith('fullchain')).sort().pop()
         const key = fs.readdirSync('./').filter(
             value => value.startsWith('privkey')).sort().pop()
         return {
-            key:key,
-            cert:cert
+            key: key,
+            cert: cert
         }
 
-    }catch(e){
+    } catch (e) {
         logger.warn('Retrieving newest cert and key failed, falling back to env variable location')
         return {
             key: fs.readFileSync(process.env.KEYLOCATION),

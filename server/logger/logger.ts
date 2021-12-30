@@ -10,23 +10,22 @@ const prettyStream = pinoms.prettyStream({
             messageFormat: (log, messageKey) => {
                 let message = `${log[messageKey]}`
                 try {
-                    if (log.user.room) message = `[Room ${log.user.room.id}] ` + message
-                }catch (e){
+                    if (log.user.room) message = `[Room ${log.user.room.id}] ${message}`
+                } catch (e) {
                     //pass
                 }
-                if(log.room) message = `[Room ${log.room.id}] ` + message
+                if (log.room) message = `[Room ${log.room.id}] ${message}`
 
-                if(log.user) message = `[User ${log.user.id} "${log.user.username}"] ` + message
+                if (log.user) message = `[User ${log.user.id} "${log.user.username}"] ${message}`
 
                 return message
             }
-        },
-
+        }
 })
 
 const streams = [
-    {stream: fs.createWriteStream('./logs/info.tbt.json') }, //TODO log filei s missing "top-level" json format
-    {stream: prettyStream }
+    {stream: fs.createWriteStream('./logs/info.tbt.jsonl')}, //TODO log filei s missing "top-level" json format
+    {stream: prettyStream}
 ]
 
 const logger = pinoms(pinoms.multistream(streams))
@@ -46,4 +45,4 @@ logger.logRoom = (msg, room) => {
     })
 }
 
-export  default logger
+export default logger
