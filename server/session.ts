@@ -42,13 +42,14 @@ function getCertOptions() {
 
     try{
         logger.info('Grabbing cert and key')
-        const cert = fs.readdirSync('./').filter(
+        const cert = fs.readdirSync('./cert/').filter(
             value => value.startsWith('fullchain')).sort().pop()
-        const key = fs.readdirSync('./').filter(
+        const key = fs.readdirSync('./cert/').filter(
             value => value.startsWith('privkey')).sort().pop()
+        logger.info(`grabbed cert: ${cert} and key: ${key}`)
         return {
-            key:key,
-            cert:cert
+            key:'/cert/' + key,
+            cert:'/cert/' + cert
         }
 
     }catch(e){
