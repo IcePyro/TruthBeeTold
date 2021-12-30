@@ -49,8 +49,8 @@ function getCertOptions() {
             value => value.startsWith('privkey')).sort().pop()
         console.log(`grabbed cert: ${cert} and key: ${key}`)
         return {
-            key:'/cert/' + key,
-            cert:'/cert/' + cert
+            key:fs.readFileSync('/cert/' + key),
+            cert:fs.readFileSync('/cert/' + cert)
         }
 
     }catch(e){
