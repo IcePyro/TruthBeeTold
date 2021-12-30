@@ -41,6 +41,7 @@ export const io = init();
 function getCertOptions() {
 
     try{
+        logger.info('Grabbing cert and key')
         const cert = fs.readdirSync('./').filter(
             value => value.startsWith('fullchain')).sort().pop()
         const key = fs.readdirSync('./').filter(
@@ -51,6 +52,7 @@ function getCertOptions() {
         }
 
     }catch(e){
+        logger.warn('Retrieving newest cert and key failed, falling back to env variable location')
         return {
             key: fs.readFileSync(process.env.KEYLOCATION),
             cert: fs.readFileSync(process.env.CERTLOCATION)
