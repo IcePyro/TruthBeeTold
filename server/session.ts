@@ -21,7 +21,6 @@ function createServerProduction(app: Express) {
 const isProduction = process.env.NODE_ENV === 'production';
 
 function init(): Server {
-    getCertOptions()
     const port = parseInt(process.env.PORT || '3000');
     const app = express();
     const server = isProduction ? createServerProduction(app) : createServerDevelop(app);
