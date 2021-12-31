@@ -1,4 +1,7 @@
 import fetch from 'cross-fetch';
+import * as fs from "fs";
+import * as https from 'https';
+import {httprequest} from "./httprequest";
 
 /**
  * @param lang Language of the wikipedia. Example: de
@@ -17,7 +20,8 @@ export interface PageInfo {
 }
 
 class Wiki {
-    constructor(private options: WikiOptions) {}
+    constructor(private options: WikiOptions) {
+    }
 
     /*
                         PUBLIC METHODS
@@ -52,6 +56,54 @@ class Wiki {
         const html = Wiki.traverseJson(res, 'parse', 'text', '*');
         if (typeof html !== 'string') throw Error();
         return html;
+    }
+
+    public async pullNewCategory(title: string) {
+
+        const idData = await httprequest(`https://de.wikipedia.org/w/api.php?action=query&prop=info&titles=${title}&format=json`)
+        const id = Object.keys(idData["query"]["pages"])[0]
+        if(fs.existsSync(`../wiki/article_collections/processed/de/${id}.json`)) return
+        let raw = await this.continuePull(title)
+        fs.writeFileSync(`../wiki/article_collections/raw/de/${id}.json`, JSON.stringify(raw))
+
+        this.cleanupJson(`de/${id}.json`)
+    }
+
+
+    private async continuePull(title: string): Promise<object> {
+        const url = `https://de.wikipedia.org/w/api.php?action=query&generator=links&gpllimit=500&titles=Wikipedia:Kuriositätenkabinett&prop=info&inprop=displaytitle&format=json`
+        let returnObj = {}
+        let continueStr = ''
+
+        for (let i = 0; i < 5; i++) {
+            console.log(continueStr)
+            const continueUrl = url + '&' + continueStr
+
+            const data = await httprequest(continueUrl)
+            Object.assign(returnObj, data)
+
+            if (typeof data === "object") {
+                Object.assign(returnObj, data["query"]["pages"])
+                if (data['continue']) {
+                    continueStr = `gplcontinue=${data['continue']['gplcontinue']}`
+                } else {
+                    break
+                }
+            }
+
+        }
+        return await returnObj;
+    }
+
+    public async cleanupJson(fileLocation: string) {
+        const raw = fs.readFileSync(`../wiki/article_collections/raw/${fileLocation}`)
+        const rawJson = JSON.parse(raw.toString())
+        const clean = {}
+        for (let article in rawJson) {
+            clean[article] = {title: rawJson[article].title, pageid: rawJson[article].pageid}
+        }
+
+        fs.writeFileSync(`../wiki/article_collections/processed/${fileLocation}`, JSON.stringify(clean))
     }
 
     /*

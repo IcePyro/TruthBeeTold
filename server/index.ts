@@ -5,6 +5,14 @@ import {io} from './session';
 import {activeUsers, getNextUserId, User} from './types/User';
 import logger from "./logger/logger";
 
+import {wiki, WikiOptions} from '../wiki/'
+
+
+const wikiOptions: WikiOptions = {
+    domain: 'wikipedia.org',
+    lang: 'de',
+    ns: 0
+};
 
 export interface LobbySettings {
     any // TODO specify
@@ -15,6 +23,9 @@ export interface Session {
     constructed: number;
 }
 
+export const w = wiki(wikiOptions);
+
+w.pullNewCategory("Wikipedia:Kuriositätenkabinett")
 
 export const lobbysettings: { [key: string]: LobbySettings } = {}; //this should probably be a DB later
 
@@ -23,7 +34,7 @@ export const sessions: Map<string, Session> = new Map<string, Session>() // TODO
 io.on("connection", (socket) => {
     constructSession(socket);
 
-    updateUserState(io,activeUsers[socket.data.id])
+    updateUserState(io, activeUsers[socket.data.id])
 
     socket.on("disconnect", () => {
         logger.logUser(`Socket ${socket.id} disconnected`, activeUsers[socket.data.id]);

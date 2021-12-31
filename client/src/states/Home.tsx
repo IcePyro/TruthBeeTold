@@ -8,6 +8,8 @@ import {game} from '../game/Game';
 import {Page} from '../components/Page';
 import {Button, FormControl, InputGroup} from 'react-bootstrap';
 
+
+
 class HomeModel {
   constructor() {
     makeAutoObservable(this);
@@ -52,7 +54,7 @@ export default class Home extends StateComponent {
       <div style={this.props.stateModel.enabledStyle}>
         <h1>Home</h1>
         <FormControl id="lobbyid" defaultValue={this.model.lobbyId}
-                     onChange={e => this.model.setLobbyId(e.target.value)}/>
+          onChange={e => this.model.setLobbyId(e.target.value)}/>
         <Button onClick={() => this.onJoinLobby()}>Join Lobby</Button>
         <Button onClick={() => this.onCreateLobby()}>Create Lobby</Button>
       </div>
