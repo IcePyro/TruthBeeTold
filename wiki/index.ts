@@ -45,7 +45,17 @@ class Wiki {
         const id = Wiki.traverseJson(res, 'query', 'random', 0, 'id');
         const title = Wiki.traverseJson(res, 'query', 'random', 0, 'title');
         if (typeof id !== 'number' || typeof title !== 'string') throw Error();
-        return {id, title};
+        return this.getRandomFromLocal("483975");
+    }
+
+    private async getRandomFromLocal(id) {
+        const articleCollection = JSON.parse(fs.readFileSync(`../wiki/article_collections/processed/de/${id}.json`).toString())
+        const randomKey = Object.keys(articleCollection)[Math.floor(Math.random() * Object.keys(articleCollection).length)]
+        if (articleCollection[randomKey].id) {
+            return articleCollection[randomKey]
+        }else{
+            console.log(articleCollection[randomKey])
+        }
     }
 
     public async pageHTML(pageId: number): Promise<string> {
@@ -62,7 +72,7 @@ class Wiki {
 
         const idData = await httprequest(`https://de.wikipedia.org/w/api.php?action=query&prop=info&titles=${title}&format=json`)
         const id = Object.keys(idData["query"]["pages"])[0]
-        if(fs.existsSync(`../wiki/article_collections/processed/de/${id}.json`)) return
+        if (fs.existsSync(`../wiki/article_collections/processed/de/${id}.json`)) return
         let raw = await this.continuePull(title)
         fs.writeFileSync(`../wiki/article_collections/raw/de/${id}.json`, JSON.stringify(raw))
 
@@ -100,7 +110,7 @@ class Wiki {
         const rawJson = JSON.parse(raw.toString())
         const clean = {}
         for (let article in rawJson) {
-            clean[article] = {title: rawJson[article].title, pageid: rawJson[article].pageid}
+            clean[article] = {title: rawJson[article].title, id: rawJson[article].pageid}
         }
 
         fs.writeFileSync(`../wiki/article_collections/processed/${fileLocation}`, JSON.stringify(clean))

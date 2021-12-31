@@ -48,18 +48,17 @@ export default class ArticleSelect extends StateComponent {
   }
 
   private selectArticle() {
-    const input = document.getElementById('article-select') as HTMLInputElement;
-    if (input.value) {
-      user.socket.emit('lockinarticle', input.value);
-    }
+    user.socket.emit('lockinarticle');
   }
 
   private async randomArticle() {
     const w = wiki(wikiOptions);
-    const page = await w.randomPage();
-    (document.getElementById('article-select') as HTMLInputElement).value = page.title;
-    const html = await w.pageHTML(page.id);
-    this.model.setArticleHtml(html);
+    user.socket.emit('randomarticle');
+    user.socket.once('randomarticleresponse',async (page) =>{
+      (document.getElementById('article-select') as HTMLInputElement).value = page.title;
+      const html = await w.pageHTML(page.id);
+      this.model.setArticleHtml(html);
+    });
   }
 
   render() {

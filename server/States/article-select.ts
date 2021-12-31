@@ -4,27 +4,36 @@ import Room from '../types/Room';
 import {User} from '../types/User';
 import {Server} from "socket.io";
 import logger from "../logger/logger";
+import {w} from "../index";
 
 
-export default function (_: Server, user: User): void {
+export default async function (_: Server, user: User): Promise<void> {
     const room = user.room;
+    const article = await w.randomPage()
+    let articleID = article.id.toString()
 
     user.socket.emit('lockedstatusown', {
         status: getLockedArticleData(room)
     });
 
-    const articleSelectListener = (articleID) => {
-        if (articleID) {
-            articleID = articleID.toString()
-            user.articleID = articleID;
-            logger.logUser(`Selected article: ${articleID}`)
-            if (user.room.allArticleLock) {
-                junctionUsers(io, room)
-            } else {
-                user.room.emitAll('lockedstatus', getLockedArticleData(room));
-            }
-        }
+    const randomArticleListener = () => {
+        w.randomPage().then((articleInfo) => {
+            articleID = articleInfo.id.toString()
+            user.socket.emit('randomarticleresponse', articleInfo)
+        })
     }
+
+    const articleSelectListener = () => {
+        user.articleID = articleID.toString()
+        logger.logUser(`Selected article: ${articleID}`)
+        if (user.room.allArticleLock) {
+            junctionUsers(io, room)
+        } else {
+            user.room.emitAll('lockedstatus', getLockedArticleData(room));
+        }
+
+    }
+    user.socket.on('randomarticle', randomArticleListener)
     user.socket.once('lockinarticle', articleSelectListener)
 }
 
