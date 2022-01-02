@@ -5,7 +5,7 @@ import {io} from './session';
 import {activeUsers, getNextUserId, User} from './types/User';
 import logger from "./logger/logger";
 
-import {wiki, WikiOptions} from './wiki/'
+import {wiki, WikiOptions} from '../wiki/'
 
 
 const wikiOptions: WikiOptions = {
