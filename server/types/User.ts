@@ -15,6 +15,7 @@ export class User {
     username?: string = generateUsername();
     state?: number;
     room?: Room;
+    roomTimeout?: NodeJS.Timeout;
     id?: number;
     sessionToken?: string;
 

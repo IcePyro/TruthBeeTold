@@ -94,39 +94,23 @@ export default class Room {
             logger.logRoom('Room Deleted', this)
         }
         if (!this.isIngame) {
-            this.leave(userID)
-            activeUsers[userID].reset()
-            this.emitLobbyData()
+            activeUsers[userID].roomTimeout = setTimeout(() => {
+                console.log("time is up")
+                if (activeUsers[userID].socket.disconnected) {
+                    this.removeUser(activeUsers[userID])
+                }
+            }, 5000)
+
         } else {
             //TODO ask lobby host, if he wants to kick or to wait
         }
     }
 
-    /*private async awaitReconnect(user): Promise<boolean> {
-
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(false);
-            }, 5000);
-            while (true) {
-                console.log(user.socket.disconnected)
-                if (user.socket.disconnected === false) {
-                    return
-                }
-            }
-        });
-
-        const end = Date.now() + 5000
-        while (Date.now() < end) {
-            console.log(user.socket.disconnected)
-            if (user.socket.disconnected === false) {
-                return
-            }
-        }
+    private removeUser(user) {
         this.leave(user.id)
         user.reset()
         this.emitLobbyData()
-    }*/
+    }
 
 
     public newQueen(): User {
