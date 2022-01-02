@@ -4,6 +4,7 @@ COPY ./server/package*.json /server/
 COPY ./wiki/package*.json /wiki/
 WORKDIR /server/
 CMD ["npm", "install"]
+WORKDIR /
 COPY ./server/ /server/
 COPY ./wiki/ /wiki/
 EXPOSE 3000
