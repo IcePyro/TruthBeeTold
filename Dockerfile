@@ -1,7 +1,7 @@
 FROM node:14
 RUN mkdir /cert
-COPY ./server/package*.json ./server/package*.json
-COPY ./wiki/package*.json ./wiki/package*.json
+COPY ./server/package*.json ./server/
+COPY ./wiki/package*.json ./wiki/
 CMD ["npm", "--prefix", "./server", "install", "./server"]
 
 COPY ./server/ ./server/
