@@ -94,13 +94,15 @@ export default class Room {
             logger.logRoom('Room Deleted', this)
         }
         if (!this.isIngame) {
-            this.awaitReconnect(activeUsers[userID])
+            this.leave(userID)
+            activeUsers[userID].reset()
+            this.emitLobbyData()
         } else {
             //TODO ask lobby host, if he wants to kick or to wait
         }
     }
 
-    private async awaitReconnect(user): Promise<boolean> {
+    /*private async awaitReconnect(user): Promise<boolean> {
 
         return new Promise(resolve => {
             setTimeout(() => {
@@ -124,7 +126,7 @@ export default class Room {
         this.leave(user.id)
         user.reset()
         this.emitLobbyData()
-    }
+    }*/
 
 
     public newQueen(): User {
