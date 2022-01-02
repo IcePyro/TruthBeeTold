@@ -11,17 +11,18 @@ let lobbyCounter = 0;
 export default class Room {
     public static byId(id: string): Room {
 
-        if(activeRooms.has(id)){
+        if (activeRooms.has(id)) {
             return activeRooms.get(id)
-        }else{
+        } else {
             activeRooms.set(id, new Room(id))
-            return  activeRooms.get(id)
+            return activeRooms.get(id)
         }
     }
 
-    private constructor(public id: string) {}
+    private constructor(public id: string) {
+    }
 
-    private joinedUsers:number[] = []
+    private joinedUsers: number[] = []
 
     public isIngame = false
 
@@ -38,10 +39,10 @@ export default class Room {
 
     public usersWithout(...without: User[]): User[] {
         return this.users.filter((user) => {
-                return without.find(findUser =>{
-                    return user.id === findUser.id;
-                }) === undefined;
-            });
+            return without.find(findUser => {
+                return user.id === findUser.id;
+            }) === undefined;
+        });
     }
 
     public usersInState(state: StateID): User[] {
@@ -78,13 +79,13 @@ export default class Room {
         }
     }
 
-    public leave(userID:number): void{
+    public leave(userID: number): void {
         this.joinedUsers = this.joinedUsers.filter(u => u !== userID)
         logger.logUser('Left', activeUsers[userID])
     }
 
-    public notifyDisconnect(userID:number): void{
-        if(this.joinedUsers.every(uID => activeUsers[uID].socket.disconnected === true)){
+    public async notifyDisconnect(userID: number): Promise<void> {
+        if (this.joinedUsers.every(uID => activeUsers[uID].socket.disconnected === true)) {
             this.joinedUsers.forEach(uID => {
                 activeUsers[uID].reset()
 
@@ -92,14 +93,39 @@ export default class Room {
             activeRooms.delete(this.id)
             logger.logRoom('Room Deleted', this)
         }
-        if(!this.isIngame){
-            this.leave(userID)
-            activeUsers[userID].reset()
-            this.emitLobbyData()
-        }else{
+        if (!this.isIngame) {
+            this.awaitReconnect(activeUsers[userID])
+        } else {
             //TODO ask lobby host, if he wants to kick or to wait
         }
     }
+
+    private async awaitReconnect(user): Promise<boolean> {
+
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(false);
+            }, 5000);
+            while (true) {
+                console.log(user.socket.disconnected)
+                if (user.socket.disconnected === false) {
+                    return
+                }
+            }
+        });
+
+        const end = Date.now() + 5000
+        while (Date.now() < end) {
+            console.log(user.socket.disconnected)
+            if (user.socket.disconnected === false) {
+                return
+            }
+        }
+        this.leave(user.id)
+        user.reset()
+        this.emitLobbyData()
+    }
+
 
     public newQueen(): User {
         const users = this.users;
@@ -111,12 +137,12 @@ export default class Room {
         return users[Math.floor(Math.random() * users.length)];
     }
 
-    public emitAll(event: string, data: any) :void{
+    public emitAll(event: string, data: any): void {
         this.users.forEach(user => user.socket.emit(event, data))
         logger.logRoom(`Emitted to all: "${event}"`, this)
     }
 
-    public emitLobbyData():void{
+    public emitLobbyData(): void {
         this.emitAll('lobbydata', {
             lobbyId: this.id,
             users: this.users.map(user => ({userid: user.id, username: user.username, ready: user.ready}))
@@ -126,19 +152,20 @@ export default class Room {
 
     /*@returns a hash generated from an internal counter and the current datetime, converted to a base ten number and cut to length 7.
      * checks for collision with existing rooms, and generates a new id on collision. This will produce a collision about every 3000 hashes*/
-    public static newRoomID(): string{
+    public static newRoomID(): string {
         lobbyCounter += 1;
 
         const hrTime = process.hrtime();
 
-        const hash = sha256(lobbyCounter.toString() + (hrTime[0] * 1000000 + hrTime[1] / 1000).toString()).toString().slice(0,9);
+        const hash = sha256(lobbyCounter.toString() + (hrTime[0] * 1000000 + hrTime[1] / 1000).toString()).toString().slice(0, 9);
 
-        let id = parseInt(hash, 16).toString().slice(0,7);
+        let id = parseInt(hash, 16).toString().slice(0, 7);
 
-        if(activeRooms.has(id)){
+        if (activeRooms.has(id)) {
             id = this.newRoomID()
         }
         return id;
     }
+
 }
 
