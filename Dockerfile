@@ -1,11 +1,11 @@
 FROM node:14
 RUN mkdir /cert
-COPY ./server/package*.json /server/
-COPY ./wiki/package*.json /wiki/
-WORKDIR /server/
+COPY ./server/package*.json /server
+COPY ./wiki/package*.json /wiki
+WORKDIR /server
 CMD ["npm", "install"]
 WORKDIR /
-COPY ./server/ /server/
-COPY ./wiki/ /wiki/
+COPY ./server /server
+COPY ./wiki /wiki
 EXPOSE 3000
 CMD ["npm", "--prefix", "./server","start"]
